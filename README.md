@@ -2,7 +2,8 @@
 
 ## 功能概述
 
-- 实现了将 `TikTokLiveClient` 中部分功能通过服务端接口调用的能力。
+- 项目基于 [TikTokLiveJava](https://github.com/jwdeveloper/TikTokLiveJava)
+   实现了将 `TikTokLiveClient` 中部分功能通过服务端接口调用的能力。
 - 提供了基于jpa的数据存储实现。
 
 ## 1. 服务端接口实现
