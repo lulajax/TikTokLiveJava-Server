@@ -74,15 +74,15 @@ public class LiveClientService {
 
     public LiveHttpClient getHttpClient() {
         if (httpClient == null) {
-            ProxyClientSettings proxySettings = new ProxyClientSettings();
-            proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
-            proxySettings.setType(Proxy.Type.SOCKS);
-            proxySettings.addProxy("192.168.84.76", 8119);
-            proxySettings.setEnabled(true);
+//            ProxyClientSettings proxySettings = new ProxyClientSettings();
+//            proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
+//            proxySettings.setType(Proxy.Type.HTTP);
+//            proxySettings.addProxy("192.168.84.76", 8118);
+//            proxySettings.setEnabled(true);
 
             LiveClientSettings liveClientSettings = LiveClientSettings.createDefault();
             liveClientSettings.setOffline(false);
-            liveClientSettings.getHttpSettings().setProxyClientSettings(proxySettings);
+//            liveClientSettings.getHttpSettings().setProxyClientSettings(proxySettings);
 
             httpClient = new TikTokLiveHttpClient(new HttpClientFactory(liveClientSettings));
         }
@@ -102,11 +102,11 @@ public class LiveClientService {
                     liveClientSettings.setOffline(false);
                     liveClientSettings.setPrintToConsole(true);
                     liveClientSettings.setFetchGifts(false);
-                    liveClientSettings.getHttpSettings().configureProxy(proxySettings -> {
-                        proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
-                        proxySettings.setType(Proxy.Type.SOCKS);
-                        proxySettings.addProxy("192.168.84.76", 8119);
-                    });
+//                    liveClientSettings.getHttpSettings().configureProxy(proxySettings -> {
+//                        proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
+//                        proxySettings.setType(Proxy.Type.HTTP);
+//                        proxySettings.addProxy("192.168.84.76", 8118);
+//                    });
                 })
                 .onConnected((liveClient, event) -> {
                     liveClient.getLogger().info("Connected");
@@ -170,13 +170,18 @@ public class LiveClientService {
         if (!liveUserData.isHostNameValid()) {
             throw new TikTokLiveRequestException("Host name is not valid");
         }
-        LiveClientConnect clientInfo = liveClientRepository.findByHostName(hostName);
-        if (clientInfo == null) {
-            clientInfo = new LiveClientConnect().buildFrom(liveUserData);
+
+        if (liveUserData.isLiveOnline()) {
+            return createClientConnect(hostName);
         } else {
-            clientInfo.buildFrom(liveUserData);
+            LiveClientConnect clientInfo = liveClientRepository.findByHostName(hostName);
+            if (clientInfo == null) {
+                clientInfo = new LiveClientConnect().buildFrom(liveUserData);
+            } else {
+                clientInfo.buildFrom(liveUserData);
+            }
+            return liveClientRepository.save(clientInfo);
         }
-        return liveClientRepository.save(clientInfo);
     }
 
     @Transactional

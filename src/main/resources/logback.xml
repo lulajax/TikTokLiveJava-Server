@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
-    <contextName>elAdmin</contextName>
+    <contextName>tiktokLive</contextName>
 
     <!-- 定义日志文件 输入位置 -->
     <property name="log_dir" value="./logs" />

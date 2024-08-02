@@ -77,7 +77,7 @@ public class LiveClientController {
     }
 
     @GetMapping("/connect/list")
-    public CommonResult<List<LiveClientConnect>> clientConnectList(@RequestParam("hostName") String hostName) {
+    public CommonResult<List<LiveClientConnect>> clientConnectList(@RequestParam(name = "hostName", required = false) String hostName) {
         return CommonResult.success(liveClientService.getClientConnectList(hostName));
     }
 

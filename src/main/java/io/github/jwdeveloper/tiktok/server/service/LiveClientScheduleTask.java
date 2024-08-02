@@ -38,7 +38,7 @@ public class LiveClientScheduleTask {
     private final LiveClientService liveClientService;
     private final LiveRoomService liveRoomService;
 
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void checkLiveClient() {
         log.info("Checking clients");
         List<LiveClientConnect> connects = liveClientService.getClientConnectList(null).stream().filter(x -> ConnectionState.CONNECTED.name().equals(x.getConnectionState())).toList();

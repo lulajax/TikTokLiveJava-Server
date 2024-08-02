@@ -22,16 +22,43 @@
  */
 package io.github.jwdeveloper.tiktok.server;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import java.awt.*;
+import java.net.URI;
+
+@Slf4j
 @SpringBootApplication
 @EnableScheduling
 public class ServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ServerApplication.class, args);
+
+        ConfigurableApplicationContext context = SpringApplication.run(ServerApplication.class, args);
+
+        ConfigurableEnvironment env = context.getEnvironment();
+        String port = env.getProperty("server.port");
+        openBrowser("http://localhost:" + port + "/web/index.html");
     }
 
+    private static void openBrowser(String url) {
+        log.info("--------------------------------------------------------------------------------");
+        log.info("- PLEASE OPEN YOUR BROWSER TO ACCESS：" + url +"               -");
+        log.info("- PLEASE OPEN YOUR BROWSER TO ACCESS：" + url +"               -");
+        log.info("- PLEASE OPEN YOUR BROWSER TO ACCESS：" + url +"               -");
+        log.info("--------------------------------------------------------------------------------");
+        try {
+            Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+            if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+                desktop.browse(new URI(url));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
