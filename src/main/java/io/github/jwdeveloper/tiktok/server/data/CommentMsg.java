@@ -58,6 +58,7 @@ public class CommentMsg {
     private String userLanguage;
 
     private Long messageId;
+    private Long timeStamp;
 
     public CommentMsg buildFrom(LiveClient liveClient, TikTokCommentEvent event) {
         this.roomId = liveClient.getRoomInfo().getRoomId();
@@ -70,6 +71,7 @@ public class CommentMsg {
         this.userPictureLink = event.getUser().getPicture().getLink();
         this.userLanguage = event.getUserLanguage();
         this.messageId = event.getMessageId();
+        this.timeStamp = event.getTimeStamp();
         return this;
     }
 }

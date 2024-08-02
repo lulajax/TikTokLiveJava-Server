@@ -48,6 +48,7 @@ public class LiveClientScheduleTask {
                     log.info("hostName:{} 正在直播中", x.getHostName());
                     liveRoomService.liveTimeUpdateByRoomId(x.getRoomId());
                     liveClientService.createClientConnect(x.getHostName());
+                    Thread.sleep(5000);
                 }
             } catch (Exception e) {
                 log.error("开播监控启动失败 hostName:{}", x.getHostName(), e);

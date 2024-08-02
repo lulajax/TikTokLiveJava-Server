@@ -68,6 +68,8 @@ public class GiftMsg {
 
     private Long messageId;
 
+    private Long timeStamp;
+
     public GiftMsg buildFrom(LiveClient liveClient, TikTokGiftEvent event) {
         this.roomId = liveClient.getRoomInfo().getRoomId();
         this.hostId = liveClient.getRoomInfo().getHost().getId();
@@ -85,6 +87,7 @@ public class GiftMsg {
         this.touserPictureLink = event.getToUser().getPicture().getLink();
         this.combo = event.getCombo();
         this.messageId = event.getMessageId();
+        this.timeStamp = event.getTimeStamp();
         return this;
     }
 }
