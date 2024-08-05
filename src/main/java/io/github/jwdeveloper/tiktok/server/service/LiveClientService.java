@@ -74,15 +74,15 @@ public class LiveClientService {
 
     public LiveHttpClient getHttpClient() {
         if (httpClient == null) {
-//            ProxyClientSettings proxySettings = new ProxyClientSettings();
-//            proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
-//            proxySettings.setType(Proxy.Type.HTTP);
-//            proxySettings.addProxy("192.168.84.76", 8118);
-//            proxySettings.setEnabled(true);
+            ProxyClientSettings proxySettings = new ProxyClientSettings();
+            proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
+            proxySettings.setType(Proxy.Type.SOCKS);
+            proxySettings.addProxy("192.168.84.76", 8119);
+            proxySettings.setEnabled(true);
 
             LiveClientSettings liveClientSettings = LiveClientSettings.createDefault();
             liveClientSettings.setOffline(false);
-//            liveClientSettings.getHttpSettings().setProxyClientSettings(proxySettings);
+            liveClientSettings.getHttpSettings().setProxyClientSettings(proxySettings);
 
             httpClient = new TikTokLiveHttpClient(new HttpClientFactory(liveClientSettings));
         }
@@ -102,11 +102,11 @@ public class LiveClientService {
                     liveClientSettings.setOffline(false);
                     liveClientSettings.setPrintToConsole(true);
                     liveClientSettings.setFetchGifts(false);
-//                    liveClientSettings.getHttpSettings().configureProxy(proxySettings -> {
-//                        proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
-//                        proxySettings.setType(Proxy.Type.HTTP);
-//                        proxySettings.addProxy("192.168.84.76", 8118);
-//                    });
+                    liveClientSettings.getHttpSettings().configureProxy(proxySettings -> {
+                        proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
+                        proxySettings.setType(Proxy.Type.SOCKS);
+                        proxySettings.addProxy("192.168.84.76", 8119);
+                    });
                 })
                 .onConnected((liveClient, event) -> {
                     liveClient.getLogger().info("Connected");
@@ -152,7 +152,7 @@ public class LiveClientService {
     public LiveClientConnect disconnect(String hostName) {
         log.info("Disconnecting client for: " + hostName);
         LiveClient client = liveClientPool.get(hostName);
-        if (client != null) {
+        if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
             client.disconnect();
             liveClientPool.put(hostName, client);
         }
