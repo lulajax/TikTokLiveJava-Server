@@ -51,8 +51,8 @@ public class LiveRoomRankUserService {
 
     @Transactional
     public void updateRoomRankList(LiveRoomInfo roomInfo) {
-        liveRoomRankUserRepository.deleteAllByRoomId(roomInfo.getRoomId());
         if (roomInfo.getUsersRanking() != null) {
+            liveRoomRankUserRepository.deleteAllByRoomId(roomInfo.getRoomId());
             List<LiveRoomRankUser> rankUserList = new ArrayList<>();
             for (var rankUser : roomInfo.getUsersRanking()) {
                 if (rankUser.getUser() == null || rankUser.getScore() <= 0) {

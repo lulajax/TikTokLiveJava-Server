@@ -44,7 +44,7 @@ public class LiveRoom {
     private int totalViewersCount;
     private long startTime;
     private long endTime;
-    private long hostId;
+    private Long hostId;
     private String hostName;
 
     public LiveRoom buildFrom(LiveRoomInfo roomInfo) {

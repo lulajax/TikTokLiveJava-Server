@@ -42,7 +42,7 @@ public class CommentMsg {
     private Long id;
 
     private String roomId;
-    private long hostId;
+    private Long hostId;
     private String hostName;
 
     @Lob

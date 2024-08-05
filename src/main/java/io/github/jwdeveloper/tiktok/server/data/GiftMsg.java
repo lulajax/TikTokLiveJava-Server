@@ -39,7 +39,7 @@ public class GiftMsg {
     private Long id;
 
     private String roomId;
-    private long hostId;
+    private Long hostId;
     private String hostName;
 
     private int giftId;

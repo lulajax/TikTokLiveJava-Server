@@ -47,7 +47,7 @@ public class LiveClientConnect {
     private int totalViewersCount;
     private long startTime;
     private boolean ageRestricted;
-    private long hostId;
+    private Long hostId;
     private String hostName;
     private String hostProfileName;
     @Lob

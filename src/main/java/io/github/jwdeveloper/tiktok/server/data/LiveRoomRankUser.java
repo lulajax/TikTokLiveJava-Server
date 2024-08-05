@@ -38,12 +38,12 @@ public class LiveRoomRankUser {
     private Long id;
 
     private String roomId;
-    private long hostId;
+    private Long hostId;
     private String hostName;
 
     private int rank;
     private int score;
-    private long userId;
+    private Long userId;
     private String userName;
     private String userProfileName;
     @Lob
