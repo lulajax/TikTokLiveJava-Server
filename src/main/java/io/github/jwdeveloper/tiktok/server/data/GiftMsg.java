@@ -30,8 +30,8 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "gift_msg", indexes = {
-        @Index(name = "idx_roomId", columnList = "roomId"),
-        @Index(name = "idx_hostId", columnList = "hostId")
+        @Index(name = "idx_gift_msg_roomId", columnList = "roomId"),
+        @Index(name = "idx_gift_msg_hostId", columnList = "hostId")
 })
 public class GiftMsg {
     @Id

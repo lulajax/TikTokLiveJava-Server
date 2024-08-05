@@ -32,9 +32,9 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "live_client_connect", indexes = {
-        @Index(name = "idx_roomId", columnList = "roomId"),
-        @Index(name = "idx_hostId", columnList = "hostId"),
-        @Index(name = "idx_hostName", columnList = "hostName")
+        @Index(name = "idx_live_client_connect_roomId", columnList = "roomId"),
+        @Index(name = "idx_live_client_connect_hostId", columnList = "hostId"),
+        @Index(name = "idx_live_client_connect_hostName", columnList = "hostName")
 })
 public class LiveClientConnect {
     @Id
