@@ -38,6 +38,7 @@ import io.github.jwdeveloper.tiktok.server.data.repository.LiveRoomRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,7 @@ import java.util.List;
 public class LiveRoomRankUserService {
     private final LiveRoomRankUserRepository liveRoomRankUserRepository;
 
+    @Transactional
     public void updateRoomRankList(LiveRoomInfo roomInfo) {
         liveRoomRankUserRepository.deleteAllByRoomId(roomInfo.getRoomId());
         if (roomInfo.getUsersRanking() != null) {
