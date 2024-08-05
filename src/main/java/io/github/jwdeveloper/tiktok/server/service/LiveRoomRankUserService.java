@@ -67,8 +67,11 @@ public class LiveRoomRankUserService {
         }
     }
 
-    private static LiveRoomRankUser getLiveRoomRankUser(LiveRoomInfo roomInfo, RankingUser rankUser) {
-        var user = new LiveRoomRankUser();
+    private LiveRoomRankUser getLiveRoomRankUser(LiveRoomInfo roomInfo, RankingUser rankUser) {
+        var user = liveRoomRankUserRepository.findFirstByRoomIdAndHostId(roomInfo.getRoomId(), roomInfo.getHost().getId());
+        if (user == null) {
+            user = new LiveRoomRankUser();
+        }
         user.setHostId(roomInfo.getHost().getId());
         user.setHostName(roomInfo.getHost().getName());
         user.setRoomId(roomInfo.getRoomId());

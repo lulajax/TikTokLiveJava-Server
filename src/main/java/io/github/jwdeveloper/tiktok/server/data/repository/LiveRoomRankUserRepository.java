@@ -30,5 +30,7 @@ import java.util.List;
 public interface LiveRoomRankUserRepository extends JpaRepository<LiveRoomRankUser, Long> {
     List<LiveRoomRankUser> findAllByRoomId(String roomId);
 
+    LiveRoomRankUser findFirstByRoomIdAndHostId(String roomId, Long hostId);
+
     void deleteAllByRoomId(String roomId);
 }
