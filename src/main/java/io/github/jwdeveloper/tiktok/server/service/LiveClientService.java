@@ -141,6 +141,11 @@ public class LiveClientService {
                     CommentMsg commentMsg = new CommentMsg().buildFrom(liveClient, event);
                     commentRepository.save(commentMsg);
                 })
+                .onEmote((liveClient, event) -> {
+                    liveClient.getLogger().info("New fake Emote: " + event.getEmotes());
+                    CommentMsg commentMsg = new CommentMsg().buildFrom(liveClient, event);
+                    commentRepository.save(commentMsg);
+                })
                 .onGift((liveClient, event) -> {
                     liveClient.getLogger().info("New fake Gift: " + event.getGift());
                     GiftMsg giftMsg = new GiftMsg().buildFrom(liveClient, event);

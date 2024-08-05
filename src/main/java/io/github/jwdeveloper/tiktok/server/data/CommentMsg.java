@@ -23,6 +23,8 @@
 package io.github.jwdeveloper.tiktok.server.data;
 
 import io.github.jwdeveloper.tiktok.data.events.TikTokCommentEvent;
+import io.github.jwdeveloper.tiktok.data.events.TikTokEmoteEvent;
+import io.github.jwdeveloper.tiktok.data.models.Emote;
 import io.github.jwdeveloper.tiktok.data.models.Picture;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import jakarta.persistence.*;
@@ -73,6 +75,19 @@ public class CommentMsg {
         this.userName = event.getUser().getName();
         this.userPictureLink = event.getUser().getPicture().getLink();
         this.userLanguage = event.getUserLanguage();
+        this.messageId = event.getMessageId();
+        this.timeStamp = event.getTimeStamp();
+        return this;
+    }
+
+    public CommentMsg buildFrom(LiveClient liveClient, TikTokEmoteEvent event) {
+        this.roomId = liveClient.getRoomInfo().getRoomId();
+        this.hostId = liveClient.getRoomInfo().getHost().getId();
+        this.hostName = liveClient.getRoomInfo().getHost().getName();
+        this.link = event.getEmotes().stream().map(Emote::getPicture).map(Picture::getLink).collect(Collectors.joining(","));
+        this.userId = event.getUser().getId();
+        this.userName = event.getUser().getName();
+        this.userPictureLink = event.getUser().getPicture().getLink();
         this.messageId = event.getMessageId();
         this.timeStamp = event.getTimeStamp();
         return this;
