@@ -22,6 +22,8 @@
  */
 package io.github.jwdeveloper.tiktok.server.controller;
 
+import io.github.jwdeveloper.tiktok.data.models.gifts.Gift;
+import io.github.jwdeveloper.tiktok.data.requests.GiftsData;
 import io.github.jwdeveloper.tiktok.data.requests.LiveData;
 import io.github.jwdeveloper.tiktok.data.requests.LiveUserData;
 import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveException;
@@ -31,7 +33,11 @@ import io.github.jwdeveloper.tiktok.server.service.LiveClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -90,5 +96,22 @@ public class LiveClientController {
     @GetMapping("/liveData")
     public CommonResult<LiveData.Response> liveUData(@RequestParam("roomId") String roomId) {
         return CommonResult.success(liveClientService.getLiveData(roomId));
+    }
+
+
+    @GetMapping("/roomGifts")
+    public CommonResult<List<Map<String, Object>>> roomGifts(@RequestParam("roomId") String roomId) {
+        GiftsData.Response response = liveClientService.getRoomGifts(roomId);
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        response.getGifts().forEach(gift -> {
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", gift.getId());
+            item.put("name", gift.getName());
+            item.put("diamondCost", gift.getDiamondCost());
+            item.put("picture", gift.getPicture());
+            result.add(item);
+        });
+        return CommonResult.success(result);
     }
 }

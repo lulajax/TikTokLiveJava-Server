@@ -26,6 +26,7 @@ import cn.hutool.json.JSONUtil;
 import com.sun.tools.jconsole.JConsoleContext;
 import io.github.jwdeveloper.tiktok.TikTokLive;
 import io.github.jwdeveloper.tiktok.TikTokLiveHttpClient;
+import io.github.jwdeveloper.tiktok.data.requests.GiftsData;
 import io.github.jwdeveloper.tiktok.data.requests.LiveData;
 import io.github.jwdeveloper.tiktok.data.requests.LiveUserData;
 import io.github.jwdeveloper.tiktok.data.settings.LiveClientSettings;
@@ -74,7 +75,7 @@ public class LiveClientService {
     private String proxyType;
     @Value("${proxy.address:192.168.84.76}")
     private String proxyAddress;
-    @Value("${proxy.port:8199}")
+    @Value("${proxy.port:8119}")
     private int proxyPort;
 
 
@@ -264,5 +265,9 @@ public class LiveClientService {
             return false;
         }
         return liveUserData.isLiveOnline();
+    }
+
+    public GiftsData.Response getRoomGifts(String roomId) {
+        return getHttpClient().fetchRoomGiftsData(roomId);
     }
 }

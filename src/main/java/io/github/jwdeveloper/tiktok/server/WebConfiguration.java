@@ -39,12 +39,23 @@ import org.apache.catalina.filters.RemoteIpFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Slf4j
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")  // 配置可以被跨域的路径，/**表示所有路径
+                .allowedOrigins("*")  // 允许所有的域
+                .allowedMethods("GET", "POST", "PUT", "DELETE")  // 允许所有的HTTP方法
+                .allowedHeaders("*")  // 允许所有的头
+                .allowCredentials(false)  // 是否允许证书，默认为true
+                .maxAge(3600);  // 预检请求的缓存时间（秒），即在这个时间段里，对于相同的跨域请求不会再预检了
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
