@@ -45,6 +45,7 @@ import io.github.jwdeveloper.tiktok.server.data.repository.GiftMsgRepository;
 import io.github.jwdeveloper.tiktok.server.data.repository.LiveClientConnectRepository;
 import io.github.jwdeveloper.tiktok.server.data.repository.LiveRoomRankUserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -67,6 +68,15 @@ public class LiveClientService {
     private final LiveRoomRankUserService liveRoomRankUserService;
     private final Map<String, LiveClient> liveClientPool;
 
+    @Value("${proxy.enable:false}")
+    private boolean isProxyEnabled;
+    @Value("${proxy.type:SOCKS}")
+    private String proxyType;
+    @Value("${proxy.address:192.168.84.76}")
+    private String proxyAddress;
+    @Value("${proxy.port:8199}")
+    private int proxyPort;
+
 
     public LiveClientService(LiveRoomService liveRoomService, LiveClientConnectRepository liveClientRepository, GiftMsgRepository giftMsgRepository, CommentMsgRepository commentRepository, LiveRoomRankUserService liveRoomRankUserService) {
         this.liveRoomService = liveRoomService;
@@ -79,15 +89,16 @@ public class LiveClientService {
 
     public LiveHttpClient getHttpClient() {
         if (httpClient == null) {
-            ProxyClientSettings proxySettings = new ProxyClientSettings();
-            proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
-            proxySettings.setType(Proxy.Type.SOCKS);
-            proxySettings.addProxy("192.168.84.76", 8119);
-            proxySettings.setEnabled(true);
-
             LiveClientSettings liveClientSettings = LiveClientSettings.createDefault();
             liveClientSettings.setOffline(false);
-            liveClientSettings.getHttpSettings().setProxyClientSettings(proxySettings);
+            if (isProxyEnabled) {
+                ProxyClientSettings proxySettings = new ProxyClientSettings();
+                proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
+                proxySettings.setType(Proxy.Type.valueOf(proxyType));
+                proxySettings.addProxy(proxyAddress, proxyPort);
+                proxySettings.setEnabled(true);
+                liveClientSettings.getHttpSettings().setProxyClientSettings(proxySettings);
+            }
 
             httpClient = new TikTokLiveHttpClient(new HttpClientFactory(liveClientSettings));
         }
@@ -107,11 +118,13 @@ public class LiveClientService {
                     liveClientSettings.setOffline(false);
                     liveClientSettings.setPrintToConsole(true);
                     liveClientSettings.setFetchGifts(false);
-                    liveClientSettings.getHttpSettings().configureProxy(proxySettings -> {
-                        proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
-                        proxySettings.setType(Proxy.Type.SOCKS);
-                        proxySettings.addProxy("192.168.84.76", 8119);
-                    });
+                    if (isProxyEnabled) {
+                        liveClientSettings.getHttpSettings().configureProxy(proxySettings -> {
+                            proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
+                            proxySettings.setType(Proxy.Type.valueOf(proxyType));
+                            proxySettings.addProxy(proxyAddress, proxyPort);
+                        });
+                    }
                 })
                 .onConnected((liveClient, event) -> {
                     liveClient.getLogger().info("Connected");

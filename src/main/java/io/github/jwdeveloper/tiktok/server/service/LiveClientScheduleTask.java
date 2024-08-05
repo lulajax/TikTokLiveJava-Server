@@ -41,7 +41,7 @@ public class LiveClientScheduleTask {
     @Scheduled(cron = "0 0/10 * * * ?")
     public void checkLiveClient() {
         log.info("Checking clients");
-        List<LiveClientConnect> connects = liveClientService.getClientConnectList(null).stream().filter(x -> ConnectionState.CONNECTED.name().equals(x.getConnectionState())).toList();
+        List<LiveClientConnect> connects = liveClientService.getClientConnectList(null).stream().toList();
         connects.forEach(x -> {
             try {
                 if (liveClientService.isLiveOnline(x.getHostName())) {
