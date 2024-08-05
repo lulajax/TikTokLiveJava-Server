@@ -31,7 +31,11 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "live_client_connect")
+@Table(name = "live_client_connect", indexes = {
+        @Index(name = "idx_roomId", columnList = "roomId"),
+        @Index(name = "idx_hostId", columnList = "hostId"),
+        @Index(name = "idx_hostName", columnList = "hostName")
+})
 public class LiveClientConnect {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -22,18 +22,17 @@
  */
 package io.github.jwdeveloper.tiktok.server.data;
 
-import io.github.jwdeveloper.tiktok.data.events.gift.TikTokGiftEvent;
-import io.github.jwdeveloper.tiktok.live.LiveClient;
+import io.github.jwdeveloper.tiktok.live.LiveRoomInfo;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "gift_msg", indexes = {
+@Table(name = "live_room_rank_user", indexes = {
         @Index(name = "idx_roomId", columnList = "roomId"),
         @Index(name = "idx_hostId", columnList = "hostId")
 })
-public class GiftMsg {
+public class LiveRoomRankUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,55 +41,12 @@ public class GiftMsg {
     private long hostId;
     private String hostName;
 
-    private int giftId;
-
-    private String giftName;
-
-    private int diamondCost;
-
-    @Lob
-    @Column(name = "gift_picture_link", length = 1000)
-    private String giftPictureLink;
-
-
-    private Long userId;
+    private int rank;
+    private int score;
+    private long userId;
     private String userName;
-
+    private String userProfileName;
     @Lob
     @Column(name = "user_picture_link", length = 1000)
     private String userPictureLink;
-
-    private Long touserId;
-    private String touserName;
-
-    @Lob
-    @Column(name = "touser_picture_link", length = 1000)
-    private String touserPictureLink;
-
-    private int combo;
-
-    private Long messageId;
-
-    private Long timeStamp;
-
-    public GiftMsg buildFrom(LiveClient liveClient, TikTokGiftEvent event) {
-        this.roomId = liveClient.getRoomInfo().getRoomId();
-        this.hostId = liveClient.getRoomInfo().getHost().getId();
-        this.hostName = liveClient.getRoomInfo().getHost().getName();
-
-        this.giftId = event.getGift().getId();
-        this.giftName = event.getGift().getName();
-        this.diamondCost = event.getGift().getDiamondCost();
-        this.giftPictureLink = event.getGift().getPicture().getLink();
-        this.userId = event.getUser().getId();
-        this.userName = event.getUser().getName();
-        this.userPictureLink = event.getUser().getPicture().getLink();
-        this.touserId = event.getToUser().getId();
-        this.touserName = event.getToUser().getName();
-        this.touserPictureLink = event.getToUser().getPicture().getLink();
-        this.combo = event.getCombo();
-        this.messageId = event.getMessageId();
-        this.timeStamp = event.getTimeStamp();
-        return this;
-    }
 }

@@ -26,6 +26,7 @@ package io.github.jwdeveloper.tiktok.server.controller;
 import io.github.jwdeveloper.tiktok.server.data.CommentMsg;
 import io.github.jwdeveloper.tiktok.server.data.GiftMsg;
 import io.github.jwdeveloper.tiktok.server.data.LiveRoom;
+import io.github.jwdeveloper.tiktok.server.data.LiveRoomRankUser;
 import io.github.jwdeveloper.tiktok.server.response.CommonResult;
 import io.github.jwdeveloper.tiktok.server.service.LiveRoomService;
 import lombok.RequiredArgsConstructor;
@@ -56,5 +57,10 @@ public class LiveRoomController {
     @GetMapping("/commentMsg/list")
     public CommonResult<List<CommentMsg>> commentMsgList(@RequestParam("roomId") String roomId) {
         return CommonResult.success(liveRoomService.getCommentMsgList(roomId));
+    }
+
+    @GetMapping("/rankUser/list")
+    public CommonResult<List<LiveRoomRankUser>> liveRoomRankUserList(@RequestParam("roomId") String roomId) {
+        return CommonResult.success(liveRoomService.getLiveRoomRankUserList(roomId));
     }
 }

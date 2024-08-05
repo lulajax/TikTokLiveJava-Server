@@ -32,7 +32,10 @@ import java.util.stream.Collectors;
 
 @Data
 @Entity
-@Table(name = "comment_msg")
+@Table(name = "comment_msg", indexes = {
+        @Index(name = "idx_roomId", columnList = "roomId"),
+        @Index(name = "idx_hostId", columnList = "hostId")
+})
 public class CommentMsg {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

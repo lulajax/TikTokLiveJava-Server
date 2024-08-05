@@ -22,6 +22,7 @@
  */
 package io.github.jwdeveloper.tiktok.server.service;
 
+import cn.hutool.json.JSONUtil;
 import com.sun.tools.jconsole.JConsoleContext;
 import io.github.jwdeveloper.tiktok.TikTokLive;
 import io.github.jwdeveloper.tiktok.TikTokLiveHttpClient;
@@ -38,9 +39,11 @@ import io.github.jwdeveloper.tiktok.models.ConnectionState;
 import io.github.jwdeveloper.tiktok.server.data.CommentMsg;
 import io.github.jwdeveloper.tiktok.server.data.GiftMsg;
 import io.github.jwdeveloper.tiktok.server.data.LiveClientConnect;
+import io.github.jwdeveloper.tiktok.server.data.LiveRoomRankUser;
 import io.github.jwdeveloper.tiktok.server.data.repository.CommentMsgRepository;
 import io.github.jwdeveloper.tiktok.server.data.repository.GiftMsgRepository;
 import io.github.jwdeveloper.tiktok.server.data.repository.LiveClientConnectRepository;
+import io.github.jwdeveloper.tiktok.server.data.repository.LiveRoomRankUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,15 +64,17 @@ public class LiveClientService {
     private final LiveClientConnectRepository liveClientRepository;
     private final GiftMsgRepository giftMsgRepository;
     private final CommentMsgRepository commentRepository;
+    private final LiveRoomRankUserService liveRoomRankUserService;
     private final Map<String, LiveClient> liveClientPool;
 
 
-    public LiveClientService(LiveRoomService liveRoomService, LiveClientConnectRepository liveClientRepository, GiftMsgRepository giftMsgRepository, CommentMsgRepository commentRepository) {
+    public LiveClientService(LiveRoomService liveRoomService, LiveClientConnectRepository liveClientRepository, GiftMsgRepository giftMsgRepository, CommentMsgRepository commentRepository, LiveRoomRankUserService liveRoomRankUserService) {
         this.liveRoomService = liveRoomService;
         this.liveClientRepository = liveClientRepository;
         this.giftMsgRepository = giftMsgRepository;
         this.commentRepository = commentRepository;
         this.liveClientPool = new HashMap<>();
+        this.liveRoomRankUserService = liveRoomRankUserService;
     }
 
     public LiveHttpClient getHttpClient() {
@@ -114,7 +119,7 @@ public class LiveClientService {
                 })
                 .onDisconnected((liveClient, event) -> {
                     liveClient.getLogger().info("Disconnected");
-                    if (liveClient.getRoomInfo() != null) {
+                    if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
                         liveRoomService.liveUpdate(liveClient);
                     }
                 })
@@ -127,6 +132,10 @@ public class LiveClientService {
                     liveClient.getLogger().info("New fake Gift: " + event.getGift());
                     GiftMsg giftMsg = new GiftMsg().buildFrom(liveClient, event);
                     giftMsgRepository.save(giftMsg);
+                })
+                .onRoomInfo((liveClient, event) -> {
+                    liveClient.getLogger().info("New Room Info: " + JSONUtil.toJsonStr(event.getRoomInfo()));
+                    liveRoomRankUserService.updateRoomRankList(event.getRoomInfo());
                 })
                 .build();
 
