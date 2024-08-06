@@ -98,9 +98,12 @@
 </div>
 
 <script>
+  const params = new URLSearchParams(window.location.search);
+  const api = params.get('api');
+
   async function fetchLiveList() {
     try {
-      const response = await fetch('http://localhost:8089/api/tiktok-live/connect/list');
+      const response = await fetch(api + '/api/tiktok-live/connect/list');
       const data = await response.json();
 
       if (data.code === 200) {
@@ -121,7 +124,7 @@
     }
 
     try {
-      const response = await fetch('http://localhost:8089/api/tiktok-live/connect?hostName=' + hostName);
+      const response = await fetch(api + '/api/tiktok-live/connect?hostName=' + hostName);
       const data = await response.json();
       if (data.code === 200) {
         alert('Connection created successfully.');
@@ -142,7 +145,7 @@
     }
 
     try {
-      const response = await fetch('http://localhost:8089/api/tiktok-live/create?hostName=' + hostName);
+      const response = await fetch(api + '/api/tiktok-live/create?hostName=' + hostName);
       const data = await response.json();
       if (data.code === 200) {
         alert('Listener added successfully.');
@@ -157,7 +160,7 @@
 
   async function disconnectConnection(hostName) {
     try {
-      const response = await fetch('http://localhost:8089/api/tiktok-live/disconnect?hostName=' + hostName);
+      const response = await fetch(api + '/api/tiktok-live/disconnect?hostName=' + hostName);
       const data = await response.json();
       if (data.code === 200) {
         alert('Connection disconnected successfully.');
@@ -172,7 +175,7 @@
 
   async function removeConnection(hostName) {
     try {
-      const response = await fetch('http://localhost:8089/api/tiktok-live/remove?hostName=' + hostName);
+      const response = await fetch(api + '/api/tiktok-live/remove?hostName=' + hostName);
       const data = await response.json();
       if (data.code === 200) {
         alert('Connection removed successfully.');
@@ -187,7 +190,7 @@
 
   async function fetchRoomList(hostName) {
     try {
-      const response = await fetch('http://localhost:8089/api/tiktok-live/room/list?hostName=' + hostName);
+      const response = await fetch(api + '/api/tiktok-live/room/list?hostName=' + hostName);
       const data = await response.json();
       if (data.code === 200) {
         renderRoomList(data.data, hostName);
@@ -201,11 +204,11 @@
   }
 
   async function fetchRoomComments(roomId) {
-    window.open(`comments.html?roomId=${roomId}`, '_blank');
+    window.open(`comments.html?api=${api}&roomId=${roomId}`, '_blank');
   }
 
   async function fetchRoomGifts(roomId) {
-    window.open(`gifts.html?roomId=${roomId}`, '_blank');
+    window.open(`gifts.html?api=${api}&roomId=${roomId}`, '_blank');
   }
 
   function renderRoomList(rooms, hostName) {

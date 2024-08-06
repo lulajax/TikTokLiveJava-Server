@@ -48,7 +48,8 @@ public class LiveRoomService {
     private final CommentMsgRepository commentMsgRepository;
     private final LiveRoomRankUserRepository liveRoomRankUserRepository;
 
-    public void liveUpdate(LiveClient liveClient) {
+
+    public void liveStartUpdate(LiveClient liveClient) {
         String roomId = liveClient.getRoomInfo().getRoomId();
         LiveRoom liveRoom = liveRoomRepository.findByRoomId(roomId);
         if (liveRoom == null) {

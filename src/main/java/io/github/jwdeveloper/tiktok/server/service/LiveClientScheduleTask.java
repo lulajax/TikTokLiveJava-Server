@@ -48,7 +48,7 @@ public class LiveClientScheduleTask {
                     log.info("hostName:{} 正在直播中", x.getHostName());
                     var liveData = liveClientService.getLiveData(liveUserData.getRoomId());
                     liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
-                    liveClientService.createClientConnect(x.getHostName());
+                    liveClientService.createClientConnect(x.getHostName(), liveUserData.getRoomId());
                     Thread.sleep(5000);
                 } else {
                     log.info("hostName:{} 不在直播中", x.getHostName());

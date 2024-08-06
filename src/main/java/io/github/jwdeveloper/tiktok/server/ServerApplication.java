@@ -42,7 +42,10 @@ public class ServerApplication {
 
         ConfigurableEnvironment env = context.getEnvironment();
         String port = env.getProperty("server.port");
-        openBrowser("http://localhost:" + port + "/web/index.html");
+        String hostUrl = env.getProperty("host.url");
+
+        String url = hostUrl + ":" + port;
+        openBrowser(url + "/web/index.html?api=" + url);
     }
 
     private static void openBrowser(String url) {

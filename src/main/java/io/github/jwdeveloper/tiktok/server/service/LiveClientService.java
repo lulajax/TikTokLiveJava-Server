@@ -40,11 +40,9 @@ import io.github.jwdeveloper.tiktok.models.ConnectionState;
 import io.github.jwdeveloper.tiktok.server.data.CommentMsg;
 import io.github.jwdeveloper.tiktok.server.data.GiftMsg;
 import io.github.jwdeveloper.tiktok.server.data.LiveClientConnect;
-import io.github.jwdeveloper.tiktok.server.data.LiveRoomRankUser;
 import io.github.jwdeveloper.tiktok.server.data.repository.CommentMsgRepository;
 import io.github.jwdeveloper.tiktok.server.data.repository.GiftMsgRepository;
 import io.github.jwdeveloper.tiktok.server.data.repository.LiveClientConnectRepository;
-import io.github.jwdeveloper.tiktok.server.data.repository.LiveRoomRankUserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -108,9 +106,14 @@ public class LiveClientService {
     }
 
     public LiveClientConnect createClientConnect(String hostName) {
+        return createClientConnect(hostName, null);
+    }
+    public LiveClientConnect createClientConnect(String hostName, String roomId) {
         log.info("Creating new client for: " + hostName);
         LiveClient client = liveClientPool.get(hostName);
-        if (client != null && ConnectionState.CONNECTED.equals(client.getRoomInfo().getConnectionState())) {
+        if (client != null
+                && ConnectionState.CONNECTED.equals(client.getRoomInfo().getConnectionState())
+                && client.getRoomInfo().getRoomId().equals(roomId)) {
             log.info("Client is already connected");
             throw new TikTokLiveRequestException("Client is already connected");
         }
@@ -129,12 +132,13 @@ public class LiveClientService {
                 })
                 .onConnected((liveClient, event) -> {
                     log.info("{} Connected", liveClient.getRoomInfo().getHostName());
-                    liveRoomService.liveUpdate(liveClient);
+                    liveRoomService.liveStartUpdate(liveClient);
                 })
                 .onDisconnected((liveClient, event) -> {
                     log.info("{} Disconnected", liveClient.getRoomInfo().getHostName());
                     if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
-                        liveRoomService.liveUpdate(liveClient);
+                        var liveData = getLiveData(liveClient.getRoomInfo().getRoomId());
+                        liveRoomService.liveUpdateByRoomId(liveData, liveClient.getRoomInfo().getRoomId());
                         disconnect(liveClient.getRoomInfo().getHostName());
                     }
                 })

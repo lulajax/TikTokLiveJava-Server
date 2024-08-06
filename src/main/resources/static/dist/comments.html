@@ -12,9 +12,10 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
+        const api = params.get('api');
         const roomId = params.get('roomId');
 
-        fetch(`http://localhost:8089/api/tiktok-live/room/commentMsg/list?roomId=${roomId}`)
+        fetch(`${api}/api/tiktok-live/room/commentMsg/list?roomId=${roomId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.code === 200) {
