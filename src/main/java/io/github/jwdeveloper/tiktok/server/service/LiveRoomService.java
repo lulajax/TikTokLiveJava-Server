@@ -23,6 +23,7 @@
 package io.github.jwdeveloper.tiktok.server.service;
 
 import cn.hutool.core.date.DateUtil;
+import io.github.jwdeveloper.tiktok.data.requests.LiveData;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import io.github.jwdeveloper.tiktok.server.data.CommentMsg;
 import io.github.jwdeveloper.tiktok.server.data.GiftMsg;
@@ -57,9 +58,13 @@ public class LiveRoomService {
         liveRoomRepository.save(liveRoom);
     }
 
-    public void liveTimeUpdateByRoomId(String roomId) {
+    public void liveUpdateByRoomId(LiveData.Response liveData, String roomId) {
         LiveRoom liveRoom = liveRoomRepository.findByRoomId(roomId);
         if (liveRoom != null) {
+            liveRoom.setRoomId(roomId);
+            liveRoom.setLikesCount(liveData.getLikes());
+            liveRoom.setViewersCount(liveData.getViewers());
+            liveRoom.setTotalViewersCount(liveData.getTotalViewers());
             liveRoom.setEndTime(DateUtil.currentSeconds());
             liveRoomRepository.save(liveRoom);
         }

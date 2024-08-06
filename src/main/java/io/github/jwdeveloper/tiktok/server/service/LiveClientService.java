@@ -264,14 +264,6 @@ public class LiveClientService {
         return getHttpClient().fetchLiveData(liveDataRequest);
     }
 
-    public boolean isLiveOnline(String hostName) {
-        LiveUserData.Response liveUserData = getLiveUserData(hostName);
-        if (liveUserData == null || liveUserData.getUserStatus() == null) {
-            return false;
-        }
-        return liveUserData.isLiveOnline();
-    }
-
     public GiftsData.Response getRoomGifts(String roomId) {
         return getHttpClient().fetchRoomGiftsData(roomId);
     }

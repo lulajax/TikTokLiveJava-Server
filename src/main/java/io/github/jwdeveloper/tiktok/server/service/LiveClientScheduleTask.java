@@ -22,7 +22,6 @@
  */
 package io.github.jwdeveloper.tiktok.server.service;
 
-import io.github.jwdeveloper.tiktok.models.ConnectionState;
 import io.github.jwdeveloper.tiktok.server.data.LiveClientConnect;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,9 +43,11 @@ public class LiveClientScheduleTask {
         List<LiveClientConnect> connects = liveClientService.getClientConnectList(null).stream().toList();
         connects.forEach(x -> {
             try {
-                if (liveClientService.isLiveOnline(x.getHostName())) {
+                var liveUserData = liveClientService.getLiveUserData(x.getHostName());
+                if (liveUserData != null && liveUserData.isLiveOnline()) {
                     log.info("hostName:{} 正在直播中", x.getHostName());
-                    liveRoomService.liveTimeUpdateByRoomId(x.getRoomId());
+                    var liveData = liveClientService.getLiveData(liveUserData.getRoomId());
+                    liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
                     liveClientService.createClientConnect(x.getHostName());
                     Thread.sleep(5000);
                 } else {
