@@ -128,11 +128,11 @@ public class LiveClientService {
                     }
                 })
                 .onConnected((liveClient, event) -> {
-                    log.info("Connected");
+                    log.info("{} Connected", liveClient.getRoomInfo().getHostName());
                     liveRoomService.liveUpdate(liveClient);
                 })
                 .onDisconnected((liveClient, event) -> {
-                    log.info("Disconnected");
+                    log.info("{} Disconnected", liveClient.getRoomInfo().getHostName());
                     if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
                         liveRoomService.liveUpdate(liveClient);
                         disconnect(liveClient.getRoomInfo().getHostName());
@@ -144,21 +144,21 @@ public class LiveClientService {
                     commentRepository.save(commentMsg);
                 })
                 .onEmote((liveClient, event) -> {
-                    log.info("New fake Emote: " + event.getEmotes());
+                    log.info("{} New fake Emote: " + event.getEmotes(), liveClient.getRoomInfo().getHostName());
                     CommentMsg commentMsg = new CommentMsg().buildFrom(liveClient, event);
                     commentRepository.save(commentMsg);
                 })
                 .onGift((liveClient, event) -> {
-                    log.info("New fake Gift: " + event.getGift());
+                    log.info("{} New fake Gift: " + event.getGift(), liveClient.getRoomInfo().getHostName());
                     GiftMsg giftMsg = new GiftMsg().buildFrom(liveClient, event);
                     giftMsgRepository.save(giftMsg);
                 })
                 .onRoomInfo((liveClient, event) -> {
-                    log.info("New Room Info: " + JSONUtil.toJsonStr(event.getRoomInfo()));
+                    log.info("{} New Room Info: " + JSONUtil.toJsonStr(event.getRoomInfo()), liveClient.getRoomInfo().getHostName());
                     liveRoomRankUserService.updateRoomRankList(event.getRoomInfo());
                 })
                 .onError((liveClient, event) -> {
-                    log.info("Error: " + event.getException());
+                    log.info("{} Error: " + event.getException(), liveClient.getRoomInfo().getHostName());
                     disconnect(liveClient.getRoomInfo().getHostName());
                 })
                 .build();
@@ -176,7 +176,7 @@ public class LiveClientService {
                 return liveClientRepository.save(clientInfo);
             }
         } catch (TikTokLiveOfflineHostException e) {
-            log.info("Host is offline: " + hostName);
+            log.info("{} Host is offline", hostName);
             disconnect(hostName);
             throw e;
         }
