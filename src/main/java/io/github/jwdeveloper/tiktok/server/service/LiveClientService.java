@@ -117,7 +117,7 @@ public class LiveClientService {
         client = TikTokLive.newClient(hostName)
                 .configure(liveClientSettings -> {
                     liveClientSettings.setOffline(false);
-                    liveClientSettings.setPrintToConsole(true);
+                    liveClientSettings.setPrintToConsole(false);
                     liveClientSettings.setFetchGifts(false);
                     if (isProxyEnabled) {
                         liveClientSettings.getHttpSettings().configureProxy(proxySettings -> {
@@ -128,33 +128,38 @@ public class LiveClientService {
                     }
                 })
                 .onConnected((liveClient, event) -> {
-                    liveClient.getLogger().info("Connected");
+                    log.info("Connected");
                     liveRoomService.liveUpdate(liveClient);
                 })
                 .onDisconnected((liveClient, event) -> {
-                    liveClient.getLogger().info("Disconnected");
+                    log.info("Disconnected");
                     if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
                         liveRoomService.liveUpdate(liveClient);
+                        disconnect(liveClient.getRoomInfo().getHostName());
                     }
                 })
                 .onComment((liveClient, event) -> {
-                    liveClient.getLogger().info(event.getUser().getName()+": "+event.getText());
+                    log.info(event.getUser().getName()+": "+event.getText());
                     CommentMsg commentMsg = new CommentMsg().buildFrom(liveClient, event);
                     commentRepository.save(commentMsg);
                 })
                 .onEmote((liveClient, event) -> {
-                    liveClient.getLogger().info("New fake Emote: " + event.getEmotes());
+                    log.info("New fake Emote: " + event.getEmotes());
                     CommentMsg commentMsg = new CommentMsg().buildFrom(liveClient, event);
                     commentRepository.save(commentMsg);
                 })
                 .onGift((liveClient, event) -> {
-                    liveClient.getLogger().info("New fake Gift: " + event.getGift());
+                    log.info("New fake Gift: " + event.getGift());
                     GiftMsg giftMsg = new GiftMsg().buildFrom(liveClient, event);
                     giftMsgRepository.save(giftMsg);
                 })
                 .onRoomInfo((liveClient, event) -> {
-                    liveClient.getLogger().info("New Room Info: " + JSONUtil.toJsonStr(event.getRoomInfo()));
+                    log.info("New Room Info: " + JSONUtil.toJsonStr(event.getRoomInfo()));
                     liveRoomRankUserService.updateRoomRankList(event.getRoomInfo());
+                })
+                .onError((liveClient, event) -> {
+                    log.info("Error: " + event.getException());
+                    disconnect(liveClient.getRoomInfo().getHostName());
                 })
                 .build();
 
