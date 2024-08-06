@@ -100,7 +100,7 @@
 <script>
   async function fetchLiveList() {
     try {
-      const response = await fetch('http://8.213.145.86:8089/api/tiktok-live/connect/list');
+      const response = await fetch('http://localhost:8089/api/tiktok-live/connect/list');
       const data = await response.json();
 
       if (data.code === 200) {
@@ -121,7 +121,7 @@
     }
 
     try {
-      const response = await fetch('http://8.213.145.86:8089/api/tiktok-live/connect?hostName=' + hostName);
+      const response = await fetch('http://localhost:8089/api/tiktok-live/connect?hostName=' + hostName);
       const data = await response.json();
       if (data.code === 200) {
         alert('Connection created successfully.');
@@ -142,7 +142,7 @@
     }
 
     try {
-      const response = await fetch('http://8.213.145.86:8089/api/tiktok-live/create?hostName=' + hostName);
+      const response = await fetch('http://localhost:8089/api/tiktok-live/create?hostName=' + hostName);
       const data = await response.json();
       if (data.code === 200) {
         alert('Listener added successfully.');
@@ -157,7 +157,7 @@
 
   async function disconnectConnection(hostName) {
     try {
-      const response = await fetch('http://8.213.145.86:8089/api/tiktok-live/disconnect?hostName=' + hostName);
+      const response = await fetch('http://localhost:8089/api/tiktok-live/disconnect?hostName=' + hostName);
       const data = await response.json();
       if (data.code === 200) {
         alert('Connection disconnected successfully.');
@@ -172,7 +172,7 @@
 
   async function removeConnection(hostName) {
     try {
-      const response = await fetch('http://8.213.145.86:8089/api/tiktok-live/remove?hostName=' + hostName);
+      const response = await fetch('http://localhost:8089/api/tiktok-live/remove?hostName=' + hostName);
       const data = await response.json();
       if (data.code === 200) {
         alert('Connection removed successfully.');
@@ -187,7 +187,7 @@
 
   async function fetchRoomList(hostName) {
     try {
-      const response = await fetch('http://8.213.145.86:8089/api/tiktok-live/room/list?hostName=' + hostName);
+      const response = await fetch('http://localhost:8089/api/tiktok-live/room/list?hostName=' + hostName);
       const data = await response.json();
       if (data.code === 200) {
         renderRoomList(data.data, hostName);

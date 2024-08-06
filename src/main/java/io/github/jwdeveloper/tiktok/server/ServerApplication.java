@@ -29,8 +29,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.awt.*;
-import java.net.URI;
+import java.io.IOException;
 
 @Slf4j
 @SpringBootApplication
@@ -53,11 +52,16 @@ public class ServerApplication {
         log.info("- PLEASE OPEN YOUR BROWSER TO ACCESS：" + url +"               -");
         log.info("--------------------------------------------------------------------------------");
         try {
-            Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-            if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-                desktop.browse(new URI(url));
+            String os = System.getProperty("os.name").toLowerCase();
+
+            if (os.contains("win")) {
+                Runtime.getRuntime().exec(new String[]{"rundll32", "url.dll,FileProtocolHandler", url});
+            } else if (os.contains("mac")) {
+                Runtime.getRuntime().exec(new String[]{"open", url});
+            } else {
+                System.out.println("无法识别的操作系统，无法自动打开浏览器。");
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

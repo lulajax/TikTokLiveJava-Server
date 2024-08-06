@@ -14,7 +14,7 @@
         const params = new URLSearchParams(window.location.search);
         const roomId = params.get('roomId');
 
-        fetch(`http://8.213.145.86:8089/api/tiktok-live/room/giftMsg/list?roomId=${roomId}`)
+        fetch(`http://localhost:8089/api/tiktok-live/room/giftMsg/list?roomId=${roomId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.code === 200) {
