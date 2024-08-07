@@ -44,11 +44,12 @@ public class LiveRoomRankUserService {
     @Transactional
     public void updateRoomRankList(LiveRoomInfo roomInfo) {
         List<LiveRoomRankUser> rankUserList = new ArrayList<>();
+        long timeStamp = System.currentTimeMillis();
         for (var rankUser : roomInfo.getUsersRanking()) {
             if (rankUser.getUser() == null || rankUser.getScore() <= 0) {
                 continue;
             }
-            var user = getLiveRoomRankUser(roomInfo, rankUser, System.currentTimeMillis());
+            var user = getLiveRoomRankUser(roomInfo, rankUser, timeStamp);
             rankUserList.add(user);
         }
         if (CollectionUtil.isNotEmpty(rankUserList)) {
