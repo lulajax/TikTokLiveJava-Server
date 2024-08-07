@@ -31,4 +31,5 @@ import org.springframework.stereotype.Repository;
 public interface LiveClientConnectRepository extends JpaRepository<LiveClientConnect, Long> {
 
     LiveClientConnect findByHostName(String hostName);
+    LiveClientConnect findByHostId(Long hostId);
 }

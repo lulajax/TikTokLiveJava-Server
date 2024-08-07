@@ -172,7 +172,12 @@ public class LiveClientService {
             liveClientPool.put(hostName, client);
 
             LiveClientConnect newClient = new LiveClientConnect().buildFrom(client.getRoomInfo());
-            LiveClientConnect clientInfo = liveClientRepository.findByHostName(newClient.getHostName());
+            if (!StringUtils.hasLength(newClient.getHostName()) || newClient.getHostId() == null){
+                disconnect(hostName);
+                throw new TikTokLiveRequestException("Host name is not valid");
+            }
+
+            LiveClientConnect clientInfo = liveClientRepository.findByHostId(newClient.getHostId());
             if (clientInfo == null) {
                 return liveClientRepository.save(newClient);
             } else {
