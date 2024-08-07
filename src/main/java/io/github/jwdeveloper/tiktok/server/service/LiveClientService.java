@@ -270,6 +270,10 @@ public class LiveClientService {
         }
     }
 
+    public List<ConnectLog> getConnectLogList(String roomId) {
+        return connectLogRepository.findAllByRoomId(roomId);
+    }
+
     public LiveUserData.Response getLiveUserData(String hostName) {
         return getHttpClient().fetchLiveUserData(hostName);
     }

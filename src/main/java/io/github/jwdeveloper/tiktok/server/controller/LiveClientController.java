@@ -27,6 +27,7 @@ import io.github.jwdeveloper.tiktok.data.requests.GiftsData;
 import io.github.jwdeveloper.tiktok.data.requests.LiveData;
 import io.github.jwdeveloper.tiktok.data.requests.LiveUserData;
 import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveException;
+import io.github.jwdeveloper.tiktok.server.data.ConnectLog;
 import io.github.jwdeveloper.tiktok.server.data.LiveClientConnect;
 import io.github.jwdeveloper.tiktok.server.response.CommonResult;
 import io.github.jwdeveloper.tiktok.server.service.LiveClientService;
@@ -87,6 +88,14 @@ public class LiveClientController {
         return CommonResult.success(liveClientService.getClientConnectList(hostName));
     }
 
+    @GetMapping("/connect/logs")
+    public CommonResult<List<ConnectLog>> clientConnectLogs(@RequestParam("roomId") String roomId) {
+        try {
+            return CommonResult.success(liveClientService.getConnectLogList(roomId));
+        } catch (TikTokLiveException e) {
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 
     @GetMapping("/liveUserData")
     public CommonResult<LiveUserData.Response> liveUserData(@RequestParam("hostName") String hostName) {
