@@ -36,6 +36,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.filters.RemoteIpFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,6 +47,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Slf4j
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
+
+    @Value("${static.dist.path:classpath:/static/dist/}")
+    private String staticDistPath;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -59,7 +63,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/web/**").addResourceLocations("classpath:/static/dist/").setCachePeriod(0);
+        registry.addResourceHandler("/web/**").addResourceLocations(staticDistPath).setCachePeriod(0);
     }
 
     @Bean

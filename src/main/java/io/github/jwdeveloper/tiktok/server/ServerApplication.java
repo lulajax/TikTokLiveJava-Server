@@ -41,11 +41,8 @@ public class ServerApplication {
         ConfigurableApplicationContext context = SpringApplication.run(ServerApplication.class, args);
 
         ConfigurableEnvironment env = context.getEnvironment();
-        String port = env.getProperty("server.port");
-        String hostUrl = env.getProperty("host.url");
-
-        String url = hostUrl + ":" + port;
-        openBrowser(url + "/web/index.html?api=" + url);
+        String url = env.getProperty("index.url");
+        openBrowser(url);
     }
 
     private static void openBrowser(String url) {
