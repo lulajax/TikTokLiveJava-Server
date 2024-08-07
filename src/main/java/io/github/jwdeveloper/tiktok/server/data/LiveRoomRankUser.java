@@ -49,4 +49,5 @@ public class LiveRoomRankUser {
     @Lob
     @Column(name = "user_picture_link", length = 1000)
     private String userPictureLink;
+    private Long timeStamp;
 }

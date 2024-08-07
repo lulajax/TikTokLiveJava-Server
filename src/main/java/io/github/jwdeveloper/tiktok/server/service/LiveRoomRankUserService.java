@@ -23,18 +23,10 @@
 package io.github.jwdeveloper.tiktok.server.service;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUtil;
 import io.github.jwdeveloper.tiktok.data.models.RankingUser;
-import io.github.jwdeveloper.tiktok.live.LiveClient;
 import io.github.jwdeveloper.tiktok.live.LiveRoomInfo;
-import io.github.jwdeveloper.tiktok.server.data.CommentMsg;
-import io.github.jwdeveloper.tiktok.server.data.GiftMsg;
-import io.github.jwdeveloper.tiktok.server.data.LiveRoom;
 import io.github.jwdeveloper.tiktok.server.data.LiveRoomRankUser;
-import io.github.jwdeveloper.tiktok.server.data.repository.CommentMsgRepository;
-import io.github.jwdeveloper.tiktok.server.data.repository.GiftMsgRepository;
 import io.github.jwdeveloper.tiktok.server.data.repository.LiveRoomRankUserRepository;
-import io.github.jwdeveloper.tiktok.server.data.repository.LiveRoomRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,23 +43,20 @@ public class LiveRoomRankUserService {
 
     @Transactional
     public void updateRoomRankList(LiveRoomInfo roomInfo) {
-        if (roomInfo.getUsersRanking() != null) {
-            liveRoomRankUserRepository.deleteAllByRoomId(roomInfo.getRoomId());
-            List<LiveRoomRankUser> rankUserList = new ArrayList<>();
-            for (var rankUser : roomInfo.getUsersRanking()) {
-                if (rankUser.getUser() == null || rankUser.getScore() <= 0) {
-                    continue;
-                }
-                var user = getLiveRoomRankUser(roomInfo, rankUser);
-                rankUserList.add(user);
+        List<LiveRoomRankUser> rankUserList = new ArrayList<>();
+        for (var rankUser : roomInfo.getUsersRanking()) {
+            if (rankUser.getUser() == null || rankUser.getScore() <= 0) {
+                continue;
             }
-            if (CollectionUtil.isNotEmpty(rankUserList)) {
-                liveRoomRankUserRepository.saveAll(rankUserList);
-            }
+            var user = getLiveRoomRankUser(roomInfo, rankUser, System.currentTimeMillis());
+            rankUserList.add(user);
+        }
+        if (CollectionUtil.isNotEmpty(rankUserList)) {
+            liveRoomRankUserRepository.saveAll(rankUserList);
         }
     }
 
-    private LiveRoomRankUser getLiveRoomRankUser(LiveRoomInfo roomInfo, RankingUser rankUser) {
+    private LiveRoomRankUser getLiveRoomRankUser(LiveRoomInfo roomInfo, RankingUser rankUser, long timeStamp) {
         var user = liveRoomRankUserRepository.findFirstByRoomIdAndHostId(roomInfo.getRoomId(), roomInfo.getHost().getId());
         if (user == null) {
             user = new LiveRoomRankUser();
@@ -80,6 +69,7 @@ public class LiveRoomRankUserService {
         user.setUserId(rankUser.getUser().getId());
         user.setUserName(rankUser.getUser().getName());
         user.setUserPictureLink(rankUser.getUser().getPicture().getLink());
+        user.setTimeStamp(timeStamp);
         return user;
     }
 }

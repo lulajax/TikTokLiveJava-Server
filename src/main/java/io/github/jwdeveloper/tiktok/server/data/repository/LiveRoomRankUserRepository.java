@@ -28,7 +28,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface LiveRoomRankUserRepository extends JpaRepository<LiveRoomRankUser, Long> {
-    List<LiveRoomRankUser> findAllByRoomId(String roomId);
+    List<LiveRoomRankUser> findAllByRoomIdOrderByTimeStampDescRank(String roomId);
 
     LiveRoomRankUser findFirstByRoomIdAndHostId(String roomId, Long hostId);
 

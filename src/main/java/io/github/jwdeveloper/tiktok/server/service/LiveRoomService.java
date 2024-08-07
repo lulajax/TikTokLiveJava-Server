@@ -84,7 +84,7 @@ public class LiveRoomService {
     }
 
     public List<LiveRoomRankUser> getLiveRoomRankUserList(String roomId) {
-        return liveRoomRankUserRepository.findAllByRoomId(roomId);
+        return liveRoomRankUserRepository.findAllByRoomIdOrderByTimeStampDescRank(roomId);
     }
 
     public void remove(Long hostId) {
