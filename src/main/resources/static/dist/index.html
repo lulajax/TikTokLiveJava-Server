@@ -175,7 +175,12 @@
 
   async function removeConnection(hostName) {
     try {
-      const response = await fetch(api + '/api/tiktok-live/remove?hostName=' + hostName);
+      const response = await fetch(api + '/api/tiktok-live/remove?hostName=' + hostName, {
+        method: 'DELETE', // 设置请求方法为 DELETE
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       const data = await response.json();
       if (data.code === 200) {
         alert('Connection removed successfully.');
