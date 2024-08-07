@@ -55,6 +55,7 @@ public class GiftMsg {
 
     private Long userId;
     private String userName;
+    private String userProfileName;
 
     @Lob
     @Column(name = "user_picture_link", length = 1000)
@@ -84,6 +85,7 @@ public class GiftMsg {
         this.giftPictureLink = event.getGift().getPicture().getLink();
         this.userId = event.getUser().getId();
         this.userName = event.getUser().getName();
+        this.userProfileName = event.getUser().getProfileName();
         this.userPictureLink = event.getUser().getPicture().getLink();
         this.touserId = event.getToUser().getId();
         this.touserName = event.getToUser().getName();
