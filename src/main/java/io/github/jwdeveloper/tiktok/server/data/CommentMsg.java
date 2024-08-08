@@ -57,6 +57,7 @@ public class CommentMsg {
 
     private Long userId;
     private String userName;
+    private String userProfileName;
     @Lob
     @Column(name = "user_picture_link", length = 1000)
     private String userPictureLink;
@@ -73,6 +74,7 @@ public class CommentMsg {
         this.link = event.getPictures().stream().map(Picture::getLink).collect(Collectors.joining(","));
         this.userId = event.getUser().getId();
         this.userName = event.getUser().getName();
+        this.userProfileName = event.getUser().getProfileName();
         this.userPictureLink = event.getUser().getPicture().getLink();
         this.userLanguage = event.getUserLanguage();
         this.messageId = event.getMessageId();
