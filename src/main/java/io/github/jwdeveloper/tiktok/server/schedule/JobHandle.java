@@ -33,7 +33,6 @@ public class JobHandle {
                     var liveData = liveClientService.getLiveData(liveUserData.getRoomId());
                     liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
                     liveClientService.createClientConnect(x.getHostName(), liveUserData.getRoomId());
-                    Thread.sleep(5000);
                 } else {
                     log.info("hostName:{} 不在直播中", x.getHostName());
                     liveClientService.disconnect(x.getHostName());
@@ -56,7 +55,6 @@ public class JobHandle {
                     var liveData = liveClientService.getLiveData(liveUserData.getRoomId());
                     liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
                     liveClientService.createClientConnect(hostName, liveUserData.getRoomId());
-                    Thread.sleep(5000);
                 } else {
                     log.info("hostName:{} 不在直播中", hostName);
                     liveClientService.disconnect(hostName);

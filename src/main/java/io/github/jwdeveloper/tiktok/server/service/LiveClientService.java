@@ -22,6 +22,7 @@
  */
 package io.github.jwdeveloper.tiktok.server.service;
 
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.json.JSONUtil;
 import com.sun.tools.jconsole.JConsoleContext;
 import io.github.jwdeveloper.tiktok.TikTokLive;
@@ -175,6 +176,8 @@ public class LiveClientService {
 
         try {
             client.connect();
+            // wait for connection
+            ThreadUtil.safeSleep(5000);
             liveClientPool.put(hostName, client);
 
             LiveClientConnect newClient = new LiveClientConnect().buildFrom(client.getRoomInfo());
