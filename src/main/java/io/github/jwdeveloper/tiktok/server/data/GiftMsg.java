@@ -31,7 +31,8 @@ import lombok.Data;
 @Entity
 @Table(name = "gift_msg", indexes = {
         @Index(name = "idx_gift_msg_roomId", columnList = "roomId"),
-        @Index(name = "idx_gift_msg_hostId", columnList = "hostId")
+        @Index(name = "idx_gift_msg_hostId", columnList = "hostId"),
+        @Index(name = "idx_gift_msg_messageId", columnList = "messageId", unique = true)
 })
 public class GiftMsg {
     @Id

@@ -36,7 +36,8 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "comment_msg", indexes = {
         @Index(name = "idx_comment_msg_roomId", columnList = "roomId"),
-        @Index(name = "idx_comment_msg_hostId", columnList = "hostId")
+        @Index(name = "idx_comment_msg_hostId", columnList = "hostId"),
+        @Index(name = "idx_comment_msg_messageId", columnList = "messageId", unique = true)
 })
 public class CommentMsg {
     @Id

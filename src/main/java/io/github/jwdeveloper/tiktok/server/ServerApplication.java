@@ -42,7 +42,7 @@ public class ServerApplication {
 
         ConfigurableEnvironment env = context.getEnvironment();
         String url = env.getProperty("index.url");
-        openBrowser(url);
+//        openBrowser(url);
     }
 
     private static void openBrowser(String url) {

@@ -22,6 +22,7 @@
  */
 package io.github.jwdeveloper.tiktok.server.data;
 
+import com.xxl.job.core.util.IpUtil;
 import io.github.jwdeveloper.tiktok.data.requests.LiveUserData;
 import io.github.jwdeveloper.tiktok.live.LiveRoomInfo;
 import io.github.jwdeveloper.tiktok.models.ConnectionState;
@@ -61,6 +62,8 @@ public class LiveClientConnect {
     private String language;
     private String connectionState;
 
+    private String serverIp;
+
     public LiveClientConnect buildFrom(LiveRoomInfo roomInfo) {
         this.roomId = roomInfo.getRoomId();
         this.likesCount = roomInfo.getLikesCount();
@@ -76,6 +79,7 @@ public class LiveClientConnect {
         this.hostFollowers = roomInfo.getHost().getFollowers();
         this.title = roomInfo.getTitle();
         this.connectionState = roomInfo.getConnectionState().name();
+        this.serverIp = IpUtil.getIp();
         return this;
     }
 
@@ -89,6 +93,7 @@ public class LiveClientConnect {
         this.hostFollowing = liveUserData.getUser().getFollowing();
         this.hostFollowers = liveUserData.getUser().getFollowers();
         this.connectionState =  liveUserData.isLiveOnline() ? ConnectionState.CONNECTED.name() : ConnectionState.DISCONNECTED.name();
+        this.serverIp = IpUtil.getIp();
         return this;
     }
 }
