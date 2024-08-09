@@ -22,6 +22,7 @@
  */
 package io.github.jwdeveloper.tiktok.server.service;
 
+import com.xxl.job.core.util.IpUtil;
 import io.github.jwdeveloper.tiktok.models.ConnectionState;
 import io.github.jwdeveloper.tiktok.server.data.LiveClientConnect;
 import lombok.extern.slf4j.Slf4j;
@@ -43,14 +44,16 @@ public class LiveClientConnectRecoveryRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments applicationArguments) {
         log.info("--------------------初始化客户端socket连接池---------------------");
-        List<LiveClientConnect> connects = liveClientService.getClientConnectList(null).stream().filter(x -> ConnectionState.CONNECTED.name().equals(x.getConnectionState())).toList();
-        connects.forEach(x -> {
-            try {
-                liveClientService.createClientConnect(x.getHostName());
-            } catch (Exception e) {
-                log.error("初始化客户端socket连接池失败 hostName:{}", x.getHostName(), e);
-            }
-        });
+        liveClientService.getClientConnectList(null).stream()
+                .filter(x -> IpUtil.getIp().equals(x.getServerIp()))
+                .filter(x -> ConnectionState.CONNECTED.name().equals(x.getConnectionState()))
+                .forEach(x -> {
+                    try {
+                        liveClientService.createClientConnect(x.getHostName());
+                    } catch (Exception e) {
+                        log.error("初始化客户端socket连接池失败 hostName:{}", x.getHostName(), e);
+                    }
+                });
         log.info("--------------------初始化客户端socket连接池完成---------------------");
     }
 }
