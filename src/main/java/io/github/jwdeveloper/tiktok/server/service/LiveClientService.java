@@ -25,6 +25,7 @@ package io.github.jwdeveloper.tiktok.server.service;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.json.JSONUtil;
 import com.sun.tools.jconsole.JConsoleContext;
+import com.xxl.job.core.util.IpUtil;
 import io.github.jwdeveloper.tiktok.TikTokLive;
 import io.github.jwdeveloper.tiktok.TikTokLiveHttpClient;
 import io.github.jwdeveloper.tiktok.data.requests.GiftsData;
@@ -122,6 +123,11 @@ public class LiveClientService {
             log.info("Client is already connected");
             throw new TikTokLiveRequestException("Client is already connected");
         }
+        LiveClientConnect clientConnect = liveClientRepository.findByHostName(hostName);
+        if (clientConnect != null && !IpUtil.getIp().equals(clientConnect.getServerIp())) {
+            throw new TikTokLiveRequestException("Client is already created by other server");
+        }
+
         client = TikTokLive.newClient(hostName)
                 .configure(liveClientSettings -> {
                     liveClientSettings.setOffline(false);
