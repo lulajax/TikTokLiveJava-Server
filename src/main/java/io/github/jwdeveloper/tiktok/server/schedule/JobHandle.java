@@ -3,6 +3,7 @@ package io.github.jwdeveloper.tiktok.server.schedule;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.util.IpUtil;
+import io.github.jwdeveloper.tiktok.server.data.LiveClientConnect;
 import io.github.jwdeveloper.tiktok.server.service.LiveClientService;
 import io.github.jwdeveloper.tiktok.server.service.LiveRoomService;
 import lombok.AllArgsConstructor;
@@ -25,22 +26,7 @@ public class JobHandle {
         log.info("Checking clients");
         liveClientService.getClientConnectList(null).stream()
                 .filter(x -> IpUtil.getIp().equals(x.getServerIp()))
-                .forEach(x -> {
-                    try {
-                        var liveUserData = liveClientService.getLiveUserData(x.getHostName());
-                        if (liveUserData != null && liveUserData.isLiveOnline()) {
-                            log.info("hostName:{} 正在直播中", x.getHostName());
-                            var liveData = liveClientService.getLiveData(liveUserData.getRoomId());
-                            liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
-                            liveClientService.createClientConnect(x.getHostName(), liveUserData.getRoomId());
-                        } else {
-                            log.info("hostName:{} 不在直播中", x.getHostName());
-                            liveClientService.disconnect(x.getHostName());
-                        }
-                    } catch (Exception e) {
-                        log.error("开播监控启动失败 hostName:{}", x.getHostName(), e);
-                    }
-                });
+                .forEach(this::createClientConnect);
     }
 
     @XxlJob("checkLiveClientFast")
@@ -48,20 +34,27 @@ public class JobHandle {
         String param = XxlJobHelper.getJobParam();
         log.info("Checking clients fast: {}", param);
         Arrays.asList(param.split(",")).forEach(hostName -> {
-            try {
-                var liveUserData = liveClientService.getLiveUserData(hostName);
-                if (liveUserData != null && liveUserData.isLiveOnline()) {
-                    log.info("hostName:{} 正在直播中", hostName);
-                    var liveData = liveClientService.getLiveData(liveUserData.getRoomId());
-                    liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
-                    liveClientService.createClientConnect(hostName, liveUserData.getRoomId());
-                } else {
-                    log.info("hostName:{} 不在直播中", hostName);
-                    liveClientService.disconnect(hostName);
-                }
-            } catch (Exception e) {
-                log.error("开播监控启动失败 hostName:{}", hostName, e);
+            var x = liveClientService.getClientConnect(hostName);
+            if (x != null && IpUtil.getIp().equals(x.getServerIp())) {
+                createClientConnect(x);
             }
         });
+    }
+
+    private void createClientConnect(LiveClientConnect x) {
+        try {
+            var liveUserData = liveClientService.getLiveUserData(x.getHostName());
+            if (liveUserData != null && liveUserData.isLiveOnline()) {
+                log.info("hostName:{} 正在直播中", x.getHostName());
+                var liveData = liveClientService.getLiveData(liveUserData.getRoomId());
+                liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
+                liveClientService.createClientConnect(x.getHostName(), liveUserData.getRoomId());
+            } else {
+                log.info("hostName:{} 不在直播中", x.getHostName());
+                liveClientService.disconnect(x.getHostName());
+            }
+        } catch (Exception e) {
+            log.error("开播监控启动失败 hostName:{}", x.getHostName(), e);
+        }
     }
 }
