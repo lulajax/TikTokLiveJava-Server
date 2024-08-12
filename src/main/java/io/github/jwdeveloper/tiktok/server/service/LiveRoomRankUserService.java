@@ -22,7 +22,6 @@
  */
 package io.github.jwdeveloper.tiktok.server.service;
 
-import cn.hutool.core.collection.CollectionUtil;
 import io.github.jwdeveloper.tiktok.data.models.RankingUser;
 import io.github.jwdeveloper.tiktok.live.LiveRoomInfo;
 import io.github.jwdeveloper.tiktok.server.data.LiveRoomRankUser;
@@ -32,36 +31,33 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @Slf4j
 @AllArgsConstructor
 public class LiveRoomRankUserService {
     private final LiveRoomRankUserRepository liveRoomRankUserRepository;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void updateRoomRankList(LiveRoomInfo roomInfo) {
-        List<LiveRoomRankUser> rankUserList = new ArrayList<>();
         long timeStamp = System.currentTimeMillis();
         for (var rankUser : roomInfo.getUsersRanking()) {
             if (rankUser.getUser() == null || rankUser.getScore() <= 0) {
                 continue;
             }
+            if (roomInfo.getHost() == null) {
+                continue;
+            }
             var user = getLiveRoomRankUser(roomInfo, rankUser, timeStamp);
-            rankUserList.add(user);
-        }
-        if (CollectionUtil.isNotEmpty(rankUserList)) {
-            liveRoomRankUserRepository.saveAll(rankUserList);
+            liveRoomRankUserRepository.save(user);
         }
     }
 
     private LiveRoomRankUser getLiveRoomRankUser(LiveRoomInfo roomInfo, RankingUser rankUser, long timeStamp) {
-        var user = liveRoomRankUserRepository.findByRoomIdAndHostName(roomInfo.getRoomId(), roomInfo.getHost().getName());
+        var user = liveRoomRankUserRepository.findFirstByRoomIdAndHostName(roomInfo.getRoomId(), roomInfo.getHost().getName());
         if (user == null) {
             user = new LiveRoomRankUser();
         }
+
         user.setHostId(roomInfo.getHost().getId());
         user.setHostName(roomInfo.getHost().getName());
         user.setRoomId(roomInfo.getRoomId());

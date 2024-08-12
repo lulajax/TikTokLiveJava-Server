@@ -31,8 +31,8 @@ import java.util.List;
 public interface LiveRoomRankUserRepository extends JpaRepository<LiveRoomRankUser, Long> {
     List<LiveRoomRankUser> findAllByRoomIdOrderByTimeStampDescRank(String roomId);
 
-    @Query("SELECT lru FROM LiveRoomRankUser lru WHERE lru.roomId = :roomId AND lru.hostName = :hostName limit 1")
-    LiveRoomRankUser findByRoomIdAndHostName(String roomId, String hostName);
+    @Query(value = "SELECT * FROM live_room_rank_user WHERE room_id = ?1 AND host_name = ?2 LIMIT 1", nativeQuery = true)
+    LiveRoomRankUser findFirstByRoomIdAndHostName(String roomId, String hostName);
 
     void deleteAllByRoomId(String roomId);
 }

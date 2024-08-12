@@ -52,7 +52,7 @@ public class LiveClientConnect {
     private String hostName;
     private String hostProfileName;
    
-    @Column(name = "host_picture_link", length = 1000)
+    @Column(name = "host_picture_link")
     private String hostPictureLink;
 
     private long hostFollowing;

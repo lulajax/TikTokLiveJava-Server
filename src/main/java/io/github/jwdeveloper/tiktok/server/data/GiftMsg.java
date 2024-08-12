@@ -49,20 +49,20 @@ public class GiftMsg {
 
     private int diamondCost;
 
-    @Column(name = "gift_picture_link", length = 1000)
+    @Column(name = "gift_picture_link")
     private String giftPictureLink;
 
     private Long userId;
     private String userName;
     private String userProfileName;
 
-    @Column(name = "user_picture_link", length = 1000)
+    @Column(name = "user_picture_link")
     private String userPictureLink;
 
     private Long touserId;
     private String touserName;
 
-    @Column(name = "touser_picture_link", length = 1000)
+    @Column(name = "touser_picture_link")
     private String touserPictureLink;
 
     private int combo;
