@@ -143,17 +143,19 @@ public class LiveClientService {
                 })
                 .onConnected((liveClient, event) -> {
                     log.info("{} Connected", liveClient.getRoomInfo().getHostName());
+                    Long hostId = clientConnect != null && clientConnect.getHostId() != null ? clientConnect.getHostId() : liveClient.getRoomInfo().getHost().getId();
+                    ThreadUtil.execAsync(() -> connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), hostId, hostName, ConnectionState.CONNECTED.toString())));
                     liveRoomService.liveStartUpdate(liveClient);
-                    connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), liveClient.getRoomInfo().getHost().getId(), liveClient.getRoomInfo().getHost().getName(), ConnectionState.CONNECTED.toString()));
                 })
                 .onDisconnected((liveClient, event) -> {
                     log.info("{} Disconnected", liveClient.getRoomInfo().getHostName());
+                    Long hostId = clientConnect != null && clientConnect.getHostId() != null ? clientConnect.getHostId() : liveClient.getRoomInfo().getHost().getId();
+                    ThreadUtil.execAsync(() -> connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), hostId, hostName, ConnectionState.DISCONNECTED.toString())));
                     if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
                         var liveData = getLiveData(liveClient.getRoomInfo().getRoomId());
                         liveRoomService.liveUpdateByRoomId(liveData, liveClient.getRoomInfo().getRoomId());
                         disconnect(liveClient.getRoomInfo().getHostName());
                     }
-                    connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), liveClient.getRoomInfo().getHost().getId(), liveClient.getRoomInfo().getHost().getName(), ConnectionState.DISCONNECTED.toString()));
                 })
                 .onComment((liveClient, event) -> {
                     log.info(event.getUser().getName()+": "+event.getText());
@@ -176,6 +178,8 @@ public class LiveClientService {
                 })
                 .onError((liveClient, event) -> {
                     log.info("{} Error: " + event.getException(), liveClient.getRoomInfo().getHostName());
+                    Long hostId = clientConnect != null && clientConnect.getHostId() != null ? clientConnect.getHostId() : liveClient.getRoomInfo().getHost().getId();
+                    ThreadUtil.execAsync(() -> connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), hostId, hostName, "ERROR")));
                     disconnect(liveClient.getRoomInfo().getHostName());
                 })
                 .build();
