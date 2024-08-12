@@ -178,9 +178,6 @@ public class LiveClientService {
                 })
                 .onError((liveClient, event) -> {
                     log.info("{} Error: " + event.getException(), liveClient.getRoomInfo().getHostName());
-                    Long hostId = clientConnect != null && clientConnect.getHostId() != null ? clientConnect.getHostId() : liveClient.getRoomInfo().getHost().getId();
-                    ThreadUtil.execAsync(() -> connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), hostId, hostName, "ERROR")));
-                    disconnect(liveClient.getRoomInfo().getHostName());
                 })
                 .build();
 
