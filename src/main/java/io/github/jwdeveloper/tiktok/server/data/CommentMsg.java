@@ -48,18 +48,15 @@ public class CommentMsg {
     private Long hostId;
     private String hostName;
 
-    @Lob
     @Column(name = "text", length = 1000)
     private String text;
 
-    @Lob
     @Column(name = "link", length = 1000)
     private String link;
 
     private Long userId;
     private String userName;
     private String userProfileName;
-    @Lob
     @Column(name = "user_picture_link", length = 1000)
     private String userPictureLink;
     private String userLanguage;

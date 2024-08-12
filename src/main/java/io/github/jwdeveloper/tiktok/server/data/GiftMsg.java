@@ -49,23 +49,19 @@ public class GiftMsg {
 
     private int diamondCost;
 
-    @Lob
     @Column(name = "gift_picture_link", length = 1000)
     private String giftPictureLink;
-
 
     private Long userId;
     private String userName;
     private String userProfileName;
 
-    @Lob
     @Column(name = "user_picture_link", length = 1000)
     private String userPictureLink;
 
     private Long touserId;
     private String touserName;
 
-    @Lob
     @Column(name = "touser_picture_link", length = 1000)
     private String touserPictureLink;
 

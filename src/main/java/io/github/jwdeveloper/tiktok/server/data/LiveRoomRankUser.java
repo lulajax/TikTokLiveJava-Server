@@ -41,12 +41,12 @@ public class LiveRoomRankUser {
     private Long hostId;
     private String hostName;
 
-    private int rank;
-    private int score;
+    private Integer rank;
+    private Integer score;
     private Long userId;
     private String userName;
     private String userProfileName;
-    @Lob
+   
     @Column(name = "user_picture_link", length = 1000)
     private String userPictureLink;
     private Long timeStamp;

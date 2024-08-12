@@ -51,7 +51,7 @@ public class LiveClientConnect {
     private Long hostId;
     private String hostName;
     private String hostProfileName;
-    @Lob
+   
     @Column(name = "host_picture_link", length = 1000)
     private String hostPictureLink;
 
