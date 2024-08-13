@@ -24,15 +24,13 @@ package io.github.jwdeveloper.tiktok.server.data.repository;
 
 import io.github.jwdeveloper.tiktok.server.data.LiveRoomRankUser;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface LiveRoomRankUserRepository extends JpaRepository<LiveRoomRankUser, Long> {
     List<LiveRoomRankUser> findAllByRoomIdOrderByTimeStampDescRank(String roomId);
 
-    @Query(value = "SELECT * FROM live_room_rank_user WHERE room_id = ?1 AND host_name = ?2 LIMIT 1", nativeQuery = true)
-    LiveRoomRankUser findFirstByRoomIdAndHostName(String roomId, String hostName);
+    LiveRoomRankUser findFirstByRoomIdAndUserName(String roomId, String userName);
 
     void deleteAllByRoomId(String roomId);
 }

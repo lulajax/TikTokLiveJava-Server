@@ -53,7 +53,7 @@ public class LiveRoomRankUserService {
     }
 
     private LiveRoomRankUser getLiveRoomRankUser(LiveRoomInfo roomInfo, RankingUser rankUser, long timeStamp) {
-        var user = liveRoomRankUserRepository.findFirstByRoomIdAndHostName(roomInfo.getRoomId(), roomInfo.getHost().getName());
+        var user = liveRoomRankUserRepository.findFirstByRoomIdAndUserName(roomInfo.getRoomId(), rankUser.getUser().getName());
         if (user == null) {
             user = new LiveRoomRankUser();
         }
