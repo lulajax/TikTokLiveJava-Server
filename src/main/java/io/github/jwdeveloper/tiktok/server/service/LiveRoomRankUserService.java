@@ -22,10 +22,13 @@
  */
 package io.github.jwdeveloper.tiktok.server.service;
 
+import cn.hutool.core.date.DateUtil;
 import io.github.jwdeveloper.tiktok.data.models.RankingUser;
 import io.github.jwdeveloper.tiktok.live.LiveRoomInfo;
+import io.github.jwdeveloper.tiktok.server.data.LiveRoom;
 import io.github.jwdeveloper.tiktok.server.data.LiveRoomRankUser;
 import io.github.jwdeveloper.tiktok.server.data.repository.LiveRoomRankUserRepository;
+import io.github.jwdeveloper.tiktok.server.data.repository.LiveRoomRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @AllArgsConstructor
 public class LiveRoomRankUserService {
+    private final LiveRoomRepository liveRoomRepository;
     private final LiveRoomRankUserRepository liveRoomRankUserRepository;
 
     @Transactional(rollbackFor = Exception.class)
@@ -49,6 +53,24 @@ public class LiveRoomRankUserService {
             }
             var user = getLiveRoomRankUser(roomInfo, rankUser, timeStamp);
             liveRoomRankUserRepository.save(user);
+        }
+        updateRoomLiveData(roomInfo);
+    }
+
+    public void updateRoomLiveData(LiveRoomInfo roomInfo) {
+        LiveRoom liveRoom = liveRoomRepository.findByRoomId(roomInfo.getRoomId());
+        if (liveRoom != null) {
+            if (roomInfo.getLikesCount() > 0) {
+                liveRoom.setLikesCount(roomInfo.getLikesCount());
+            }
+            if (roomInfo.getViewersCount() > 0) {
+                liveRoom.setViewersCount(roomInfo.getViewersCount());
+            }
+            if (roomInfo.getTotalViewersCount() > 0) {
+                liveRoom.setTotalViewersCount(roomInfo.getTotalViewersCount());
+            }
+            liveRoom.setEndTime(DateUtil.currentSeconds());
+            liveRoomRepository.save(liveRoom);
         }
     }
 

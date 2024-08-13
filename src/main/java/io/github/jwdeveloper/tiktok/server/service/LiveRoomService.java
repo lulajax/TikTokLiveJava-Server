@@ -62,10 +62,15 @@ public class LiveRoomService {
     public void liveUpdateByRoomId(LiveData.Response liveData, String roomId) {
         LiveRoom liveRoom = liveRoomRepository.findByRoomId(roomId);
         if (liveRoom != null) {
-            liveRoom.setRoomId(roomId);
-            liveRoom.setLikesCount(liveData.getLikes());
-            liveRoom.setViewersCount(liveData.getViewers());
-            liveRoom.setTotalViewersCount(liveData.getTotalViewers());
+            if (liveData.getLikes() > 0) {
+                liveRoom.setLikesCount(liveData.getLikes());
+            }
+            if (liveData.getViewers() > 0) {
+                liveRoom.setViewersCount(liveData.getViewers());
+            }
+            if (liveData.getTotalViewers() > 0) {
+                liveRoom.setTotalViewersCount(liveData.getTotalViewers());
+            }
             liveRoom.setEndTime(DateUtil.currentSeconds());
             liveRoomRepository.save(liveRoom);
         }

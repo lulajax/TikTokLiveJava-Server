@@ -176,6 +176,9 @@ public class LiveClientService {
                     log.info("{} New Room Info: " + JSONUtil.toJsonStr(event.getRoomInfo()), liveClient.getRoomInfo().getHostName());
                     liveRoomRankUserService.updateRoomRankList(event.getRoomInfo());
                 })
+                .onJoin((liveClient, event) -> {
+                    log.info("{} New Join: " + event.getUser(), liveClient.getRoomInfo().getHostName());
+                })
                 .onError((liveClient, event) -> {
                     log.info("{} Error: " + event.getException(), liveClient.getRoomInfo().getHostName());
                 })

@@ -49,9 +49,15 @@ public class LiveRoom {
 
     public LiveRoom buildFrom(LiveRoomInfo roomInfo) {
         this.roomId = roomInfo.getRoomId();
-        this.likesCount = roomInfo.getLikesCount();
-        this.viewersCount = roomInfo.getViewersCount();
-        this.totalViewersCount = roomInfo.getTotalViewersCount();
+        if (roomInfo.getLikesCount() > 0) {
+            this.likesCount = roomInfo.getLikesCount();
+        }
+        if (roomInfo.getViewersCount() > 0) {
+            this.viewersCount = roomInfo.getViewersCount();
+        }
+        if (roomInfo.getTotalViewersCount() > 0) {
+            this.totalViewersCount = roomInfo.getTotalViewersCount();
+        }
         this.startTime = roomInfo.getStartTime();
         this.hostId = roomInfo.getHost().getId();
         this.hostName = roomInfo.getHost().getName();
