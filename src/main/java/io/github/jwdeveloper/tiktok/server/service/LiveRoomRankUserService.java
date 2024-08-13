@@ -48,9 +48,6 @@ public class LiveRoomRankUserService {
             if (rankUser.getUser() == null || rankUser.getScore() <= 0) {
                 continue;
             }
-            if (roomInfo.getHost() == null) {
-                continue;
-            }
             var user = getLiveRoomRankUser(roomInfo, rankUser, timeStamp);
             liveRoomRankUserRepository.save(user);
         }
@@ -75,7 +72,7 @@ public class LiveRoomRankUserService {
     }
 
     private LiveRoomRankUser getLiveRoomRankUser(LiveRoomInfo roomInfo, RankingUser rankUser, long timeStamp) {
-        var user = liveRoomRankUserRepository.findFirstByRoomIdAndUserName(roomInfo.getRoomId(), rankUser.getUser().getName());
+        var user = liveRoomRankUserRepository.findFirstByRoomIdAndUserId(roomInfo.getRoomId(), rankUser.getUser().getId());
         if (user == null) {
             user = new LiveRoomRankUser();
         }
