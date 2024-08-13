@@ -125,7 +125,7 @@ public class LiveClientService {
         }
         LiveClientConnect clientConnect = liveClientRepository.findByHostName(hostName);
         if (clientConnect != null && !IpUtil.getIp().equals(clientConnect.getServerIp())) {
-            throw new TikTokLiveRequestException("Client is already created by other server");
+            throw new TikTokLiveRequestException("Client is created by other server");
         }
 
         client = TikTokLive.newClient(hostName)
@@ -221,6 +221,9 @@ public class LiveClientService {
         if (connect == null) {
             return null;
         }
+        if (!IpUtil.getIp().equals(connect.getServerIp())) {
+            throw new TikTokLiveRequestException("Client is created by other server");
+        }
         connect.setConnectionState(JConsoleContext.ConnectionState.DISCONNECTED.name());
         return liveClientRepository.save(connect);
     }
@@ -239,6 +242,9 @@ public class LiveClientService {
             if (clientInfo == null) {
                 clientInfo = new LiveClientConnect().buildFrom(liveUserData);
             } else {
+                if (!IpUtil.getIp().equals(clientInfo.getServerIp())) {
+                    throw new TikTokLiveRequestException("Client is created by other server");
+                }
                 clientInfo.buildFrom(liveUserData);
             }
             return liveClientRepository.save(clientInfo);
@@ -253,18 +259,22 @@ public class LiveClientService {
             client.disconnect();
             liveClientPool.remove(hostName, client);
         }
-        try {
-            LiveClientConnect connect = liveClientRepository.findByHostName(hostName);
-            if (connect != null) {
+
+        LiveClientConnect connect = liveClientRepository.findByHostName(hostName);
+        if (connect != null) {
+            if (!IpUtil.getIp().equals(connect.getServerIp())) {
+                throw new TikTokLiveRequestException("Client is created by other server");
+            }
+            try {
                 liveClientRepository.delete(connect);
                 // 删除相关数据
                 giftMsgRepository.deleteAllByHostId(connect.getHostId());
                 commentRepository.deleteAllByHostId(connect.getHostId());
                 liveRoomService.remove(connect.getHostId());
+            } catch (Exception e) {
+                log.error("Error while removing client for: " + hostName, e);
+                return false;
             }
-        } catch (Exception e) {
-            log.error("Error while removing client for: " + hostName, e);
-            return false;
         }
         return true;
     }
