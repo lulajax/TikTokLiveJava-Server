@@ -54,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.net.Proxy;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -117,11 +118,19 @@ public class LiveClientService {
     public LiveClientConnect createClientConnect(String hostName, String roomId) {
         log.info("Creating new client for: " + hostName);
         LiveClient client = liveClientPool.get(hostName);
-        if (client != null
-                && ConnectionState.CONNECTED.equals(client.getRoomInfo().getConnectionState())
-                && client.getRoomInfo().getRoomId().equals(roomId)) {
-            log.info("Client is already connected");
-            throw new TikTokLiveRequestException("Client is already connected");
+        if (client != null && client.getRoomInfo().getRoomId().equals(roomId)) {
+            if (ConnectionState.CONNECTED.equals(client.getRoomInfo().getConnectionState())) {
+                log.info("Client is already connected");
+                throw new TikTokLiveRequestException("Client is already connected");
+            } else if (ConnectionState.CONNECTING.equals(client.getRoomInfo().getConnectionState())) {
+                log.info("Client is connecting");
+                throw new TikTokLiveRequestException("Client is connecting");
+            }
+        } else if (client != null && !client.getRoomInfo().getRoomId().equals(roomId)) {
+            // 换了一场房间，把旧的连接关闭
+            if (!ConnectionState.CONNECTED.equals(client.getRoomInfo().getConnectionState())) {
+                client.disconnect();
+            }
         }
         LiveClientConnect clientConnect = liveClientRepository.findByHostName(hostName);
         if (clientConnect != null && !IpUtil.getIp().equals(clientConnect.getServerIp())) {
@@ -133,6 +142,8 @@ public class LiveClientService {
                     liveClientSettings.setOffline(false);
                     liveClientSettings.setPrintToConsole(false);
                     liveClientSettings.setFetchGifts(false);
+                    liveClientSettings.setRetryOnConnectionFailure(true); // Reconnecting if TikTok user is offline
+                    liveClientSettings.setRetryConnectionTimeout(Duration.ofSeconds(1)); // Timeout before next reconnection
                     if (isProxyEnabled) {
                         liveClientSettings.getHttpSettings().configureProxy(proxySettings -> {
                             proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
@@ -148,7 +159,7 @@ public class LiveClientService {
                     liveRoomService.liveStartUpdate(liveClient);
                 })
                 .onDisconnected((liveClient, event) -> {
-                    log.info("{} Disconnected", liveClient.getRoomInfo().getHostName());
+                    log.info("{} Disconnected {}", liveClient.getRoomInfo().getHostName(), event.getReason());
                     Long hostId = clientConnect != null && clientConnect.getHostId() != null ? clientConnect.getHostId() : liveClient.getRoomInfo().getHost().getId();
                     ThreadUtil.execAsync(() -> connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), hostId, hostName, ConnectionState.DISCONNECTED.toString())));
                     if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
@@ -177,10 +188,10 @@ public class LiveClientService {
                     liveRoomRankUserService.updateRoomRankList(event.getRoomInfo());
                 })
                 .onJoin((liveClient, event) -> {
-                    log.info("{} New Join: " + event.getUser(), liveClient.getRoomInfo().getHostName());
+                    log.info("{} New Join: {}", liveClient.getRoomInfo().getHostName(), event.getUser());
                 })
                 .onError((liveClient, event) -> {
-                    log.info("{} Error: " + event.getException(), liveClient.getRoomInfo().getHostName());
+                    log.error("{} Error: {}", liveClient.getRoomInfo().getHostName(), event.getException().getMessage());
                 })
                 .build();
 
