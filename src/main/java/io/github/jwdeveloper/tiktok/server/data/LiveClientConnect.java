@@ -61,6 +61,7 @@ public class LiveClientConnect {
     private String title;
     private String language;
     private String connectionState;
+    private String status;
 
     private String serverIp;
 
