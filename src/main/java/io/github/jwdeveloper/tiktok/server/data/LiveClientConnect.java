@@ -65,6 +65,8 @@ public class LiveClientConnect {
 
     private String serverIp;
 
+    private boolean deleted;
+
     public LiveClientConnect buildFrom(LiveRoomInfo roomInfo) {
         this.roomId = roomInfo.getRoomId();
         this.likesCount = roomInfo.getLikesCount();

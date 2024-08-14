@@ -26,6 +26,7 @@ public class JobHandle {
         log.info("Checking clients");
         liveClientService.getClientConnectList(null).stream()
                 .filter(x -> IpUtil.getIp().equals(x.getServerIp()))
+                .filter(x -> !x.isDeleted())
                 .forEach(this::createClientConnect);
     }
 
@@ -35,7 +36,7 @@ public class JobHandle {
         log.info("Checking clients fast: {}", param);
         Arrays.asList(param.split(",")).forEach(hostName -> {
             var x = liveClientService.getClientConnect(hostName);
-            if (x != null && IpUtil.getIp().equals(x.getServerIp())) {
+            if (x != null && IpUtil.getIp().equals(x.getServerIp()) && !x.isDeleted()) {
                 createClientConnect(x);
             }
         });

@@ -46,6 +46,7 @@ public class LiveClientConnectRecoveryRunner implements ApplicationRunner {
         log.info("--------------------初始化客户端socket连接池---------------------");
         liveClientService.getClientConnectList(null).stream()
                 .filter(x -> IpUtil.getIp().equals(x.getServerIp()))
+                .filter(x -> !x.isDeleted())
                 .filter(x -> ConnectionState.CONNECTED.name().equals(x.getConnectionState()))
                 .forEach(x -> {
                     try {
