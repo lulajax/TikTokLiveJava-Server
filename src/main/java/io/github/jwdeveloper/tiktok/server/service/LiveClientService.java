@@ -142,8 +142,8 @@ public class LiveClientService {
                     liveClientSettings.setOffline(false);
                     liveClientSettings.setPrintToConsole(false);
                     liveClientSettings.setFetchGifts(false);
-                    liveClientSettings.setRetryOnConnectionFailure(true); // Reconnecting if TikTok user is offline
-                    liveClientSettings.setRetryConnectionTimeout(Duration.ofSeconds(1)); // Timeout before next reconnection
+//                    liveClientSettings.setRetryOnConnectionFailure(true); // Reconnecting if TikTok user is offline
+//                    liveClientSettings.setRetryConnectionTimeout(Duration.ofSeconds(1)); // Timeout before next reconnection
                     if (isProxyEnabled) {
                         liveClientSettings.getHttpSettings().configureProxy(proxySettings -> {
                             proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
