@@ -290,7 +290,7 @@ public class LiveClientService {
         return true;
     }
 
-    public void setHostNameValid(String hostName, String status) {
+    public void setUserStatus(String hostName, String status) {
         LiveClientConnect clientInfo = liveClientRepository.findByHostName(hostName);
         if (clientInfo != null) {
             clientInfo.setStatus(status);

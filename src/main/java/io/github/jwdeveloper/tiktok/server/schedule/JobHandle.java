@@ -45,18 +45,16 @@ public class JobHandle {
     private void createClientConnect(LiveClientConnect x) {
         try {
             var liveUserData = liveClientService.getLiveUserData(x.getHostName());
-            if (liveUserData != null && liveUserData.isLiveOnline()) {
+            if (liveUserData.isLiveOnline()) {
                 log.info("hostName:{} 正在直播中", x.getHostName());
                 var liveData = liveClientService.getLiveData(liveUserData.getRoomId());
                 liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
                 liveClientService.createClientConnect(x.getHostName(), liveUserData.getRoomId());
-            } else if (liveUserData != null && !liveUserData.isHostNameValid()) {
-                log.info("liveUserData result: {} ", liveUserData.getJson());
-                liveClientService.setHostNameValid(x.getHostName(), liveUserData.getUserStatus().name());
             } else {
                 log.info("hostName:{} 不在直播中", x.getHostName());
                 liveClientService.disconnect(x.getHostName());
             }
+            liveClientService.setUserStatus(x.getHostName(), liveUserData.getUserStatus().name());
         } catch (Exception e) {
             log.error("开播监控启动失败 hostName:{}", x.getHostName(), e);
         }
