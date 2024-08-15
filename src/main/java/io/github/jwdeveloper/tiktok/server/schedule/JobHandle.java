@@ -51,6 +51,7 @@ public class JobHandle {
                 liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
                 liveClientService.createClientConnect(x.getHostName(), liveUserData.getRoomId());
             } else if (liveUserData != null && !liveUserData.isHostNameValid()) {
+                log.info("liveUserData result: {} ", liveUserData.getJson());
                 liveClientService.setHostNameValid(x.getHostName(), liveUserData.getUserStatus().name());
             } else {
                 log.info("hostName:{} 不在直播中", x.getHostName());
