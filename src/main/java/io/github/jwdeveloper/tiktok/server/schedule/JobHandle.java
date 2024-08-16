@@ -1,5 +1,6 @@
 package io.github.jwdeveloper.tiktok.server.schedule;
 
+import cn.hutool.core.thread.ThreadUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.util.IpUtil;
@@ -53,6 +54,7 @@ public class JobHandle {
             } else {
                 log.info("hostName:{} 不在直播中", x.getHostName());
                 liveClientService.disconnect(x.getHostName());
+                ThreadUtil.safeSleep(3000);
             }
             liveClientService.setUserStatus(x.getHostName(), liveUserData.getUserStatus().name());
         } catch (Exception e) {
