@@ -47,8 +47,10 @@ import io.github.jwdeveloper.tiktok.server.data.repository.CommentMsgRepository;
 import io.github.jwdeveloper.tiktok.server.data.repository.ConnectLogRepository;
 import io.github.jwdeveloper.tiktok.server.data.repository.GiftMsgRepository;
 import io.github.jwdeveloper.tiktok.server.data.repository.LiveClientConnectRepository;
+import io.github.jwdeveloper.tiktok.server.event.GiftMsgEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -71,6 +73,8 @@ public class LiveClientService {
     private final GiftMsgRepository giftMsgRepository;
     private final CommentMsgRepository commentRepository;
     private final LiveRoomRankUserService liveRoomRankUserService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
     private final Map<String, LiveClient> liveClientPool;
 
     @Value("${proxy.enable:false}")
@@ -83,7 +87,13 @@ public class LiveClientService {
     private int proxyPort;
 
 
-    public LiveClientService(LiveRoomService liveRoomService, LiveClientConnectRepository liveClientRepository, ConnectLogRepository connectLogRepository, GiftMsgRepository giftMsgRepository, CommentMsgRepository commentRepository, LiveRoomRankUserService liveRoomRankUserService) {
+    public LiveClientService(LiveRoomService liveRoomService,
+                             LiveClientConnectRepository liveClientRepository,
+                             ConnectLogRepository connectLogRepository,
+                             GiftMsgRepository giftMsgRepository,
+                             CommentMsgRepository commentRepository,
+                             LiveRoomRankUserService liveRoomRankUserService,
+                             ApplicationEventPublisher applicationEventPublisher) {
         this.liveRoomService = liveRoomService;
         this.liveClientRepository = liveClientRepository;
         this.connectLogRepository = connectLogRepository;
@@ -91,6 +101,7 @@ public class LiveClientService {
         this.commentRepository = commentRepository;
         this.liveClientPool = new HashMap<>();
         this.liveRoomRankUserService = liveRoomRankUserService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     public LiveHttpClient getHttpClient() {
@@ -140,7 +151,7 @@ public class LiveClientService {
         client = TikTokLive.newClient(hostName)
                 .configure(liveClientSettings -> {
                     liveClientSettings.setOffline(false);
-                    liveClientSettings.setPrintToConsole(false);
+                    liveClientSettings.setPrintToConsole(true);
                     liveClientSettings.setFetchGifts(false);
 //                    liveClientSettings.setRetryOnConnectionFailure(true); // Reconnecting if TikTok user is offline
 //                    liveClientSettings.setRetryConnectionTimeout(Duration.ofSeconds(1)); // Timeout before next reconnection
@@ -182,6 +193,7 @@ public class LiveClientService {
                     log.info("{} New fake Gift: " + event.getGift(), liveClient.getRoomInfo().getHostName());
                     GiftMsg giftMsg = new GiftMsg().buildFrom(liveClient, event);
                     giftMsgRepository.save(giftMsg);
+                    applicationEventPublisher.publishEvent(new GiftMsgEvent(this, giftMsg));
                 })
                 .onRoomInfo((liveClient, event) -> {
                     log.info("{} New Room Info: " + JSONUtil.toJsonStr(event.getRoomInfo()), liveClient.getRoomInfo().getHostName());
