@@ -6,10 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @Table(name="pk_round_scores")
 public class PkRoundScores implements Serializable {
@@ -59,10 +63,6 @@ public class PkRoundScores implements Serializable {
 
     @Column(name = "time_stamp")
     private Long timeStamp;
-
-    public PkRoundScores() {
-
-    }
 
     public void copy(PkRoundScores source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));
