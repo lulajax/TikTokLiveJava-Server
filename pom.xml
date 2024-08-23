@@ -18,6 +18,7 @@
 
     <properties>
         <java.version>21</java.version>
+        <jwdeveloper.tiktok.version>1.8.6-Release</jwdeveloper.tiktok.version>
     </properties>
     <dependencies>
         <dependency>
@@ -54,13 +55,13 @@
         <dependency>
             <groupId>io.github.jwdeveloper.tiktok</groupId>
             <artifactId>API</artifactId>
-            <version>1.8.5-Release</version>
+            <version>${jwdeveloper.tiktok.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.github.jwdeveloper.tiktok</groupId>
             <artifactId>Client</artifactId>
-            <version>1.8.5-Release</version>
+            <version>${jwdeveloper.tiktok.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
