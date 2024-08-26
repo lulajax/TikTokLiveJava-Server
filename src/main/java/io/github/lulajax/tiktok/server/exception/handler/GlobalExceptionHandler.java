@@ -61,6 +61,6 @@ public class GlobalExceptionHandler {
      * 统一返回
      */
     private ResponseEntity<ApiError> buildResponseEntity(ApiError apiError) {
-        return new ResponseEntity<>(apiError, HttpStatus.valueOf(apiError.getStatus()));
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
     }
 }
