@@ -137,7 +137,7 @@ public class LiveClientService {
                 log.info("Client is connecting");
                 throw new TikTokLiveRequestException("Client is connecting");
             }
-        } else if (client != null && !client.getRoomInfo().getRoomId().equals(roomId)) {
+        } else if (client != null && StringUtils.hasLength(roomId) && !client.getRoomInfo().getRoomId().equals(roomId)) {
             // 换了一场房间，把旧的连接关闭
             if (!ConnectionState.CONNECTED.equals(client.getRoomInfo().getConnectionState())) {
                 client.disconnect();
@@ -181,19 +181,31 @@ public class LiveClientService {
                 })
                 .onComment((liveClient, event) -> {
                     log.info(event.getUser().getName()+": "+event.getText());
-                    CommentMsg commentMsg = new CommentMsg().buildFrom(liveClient, event);
-                    commentRepository.save(commentMsg);
+                    try {
+                        CommentMsg commentMsg = new CommentMsg().buildFrom(liveClient, event);
+                        commentRepository.save(commentMsg);
+                    } catch (Exception e) {
+                        log.error("Error while saving comment", e);
+                    }
                 })
                 .onEmote((liveClient, event) -> {
                     log.info("{} New fake Emote: " + event.getEmotes(), liveClient.getRoomInfo().getHostName());
-                    CommentMsg commentMsg = new CommentMsg().buildFrom(liveClient, event);
-                    commentRepository.save(commentMsg);
+                    try {
+                        CommentMsg commentMsg = new CommentMsg().buildFrom(liveClient, event);
+                        commentRepository.save(commentMsg);
+                    } catch (Exception e) {
+                        log.error("Error while saving Emote comment", e);
+                    }
                 })
                 .onGift((liveClient, event) -> {
                     log.info("{} New fake Gift: " + event.getGift(), liveClient.getRoomInfo().getHostName());
-                    GiftMsg giftMsg = new GiftMsg().buildFrom(liveClient, event);
-                    giftMsgRepository.save(giftMsg);
-                    applicationEventPublisher.publishEvent(new GiftMsgEvent(this, giftMsg));
+                    try {
+                        GiftMsg giftMsg = new GiftMsg().buildFrom(liveClient, event);
+                        giftMsgRepository.save(giftMsg);
+                        applicationEventPublisher.publishEvent(new GiftMsgEvent(this, giftMsg));
+                    } catch (Exception e) {
+                        log.error("Error while saving Gift", e);
+                    }
                 })
                 .onRoomInfo((liveClient, event) -> {
                     log.info("{} New Room Info: " + JSONUtil.toJsonStr(event.getRoomInfo()), liveClient.getRoomInfo().getHostName());
