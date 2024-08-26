@@ -76,7 +76,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>io.github.jwdeveloper.tiktok.server.ServerApplication</mainClass>
+                    <mainClass>io.github.lulajax.tiktok.server.ServerApplication</mainClass>
                 </configuration>
             </plugin>
             <!-- 跳过单元测试 -->
