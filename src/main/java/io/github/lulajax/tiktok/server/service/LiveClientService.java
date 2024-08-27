@@ -61,6 +61,8 @@ public class LiveClientService {
     private String proxyAddress;
     @Value("${proxy.port:8119}")
     private int proxyPort;
+    @Value("${eulerstream.api.key:MTliNDBhOTJhMTU3Mjcz}")
+    private String apiKey;
 
 
     public LiveClientService(LiveRoomService liveRoomService,
@@ -83,7 +85,11 @@ public class LiveClientService {
     public LiveHttpClient getHttpClient() {
         if (httpClient == null) {
             LiveClientSettings liveClientSettings = LiveClientSettings.createDefault();
+            liveClientSettings.setApiKey(apiKey);
             liveClientSettings.setOffline(false);
+            liveClientSettings.setPrintToConsole(true);
+            liveClientSettings.setFetchGifts(false);
+            liveClientSettings.setRetryOnConnectionFailure(true);
             if (isProxyEnabled) {
                 ProxyClientSettings proxySettings = new ProxyClientSettings();
                 proxySettings.setOnProxyUpdated(proxyData -> System.err.println("Next proxy: " + proxyData.toString()));
@@ -126,6 +132,7 @@ public class LiveClientService {
 
         client = TikTokLive.newClient(hostName)
                 .configure(liveClientSettings -> {
+                    liveClientSettings.setApiKey(apiKey);
                     liveClientSettings.setOffline(false);
                     liveClientSettings.setPrintToConsole(true);
                     liveClientSettings.setFetchGifts(false);
