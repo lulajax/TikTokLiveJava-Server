@@ -158,8 +158,20 @@ public class LiveClientService {
                     ThreadUtil.execAsync(() -> connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), hostId, hostName, ConnectionState.DISCONNECTED.toString())));
                     if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
                         var liveData = getLiveData(liveClient.getRoomInfo().getRoomId());
+                        if (LiveData.LiveStatus.HostOnline.equals(liveData.getLiveStatus())) {
+                            log.info("Host : {} is online, reconnecting", liveClient.getRoomInfo().getHostName());
+                            try {
+                                liveClient.connect();
+                                // wait for connection
+                                ThreadUtil.safeSleep(5000);
+                            } catch (Exception e) {
+                                log.error("Error while reconnecting", e);
+                                disconnect(liveClient.getRoomInfo().getHostName());
+                            }
+                        } else {
+                            disconnect(liveClient.getRoomInfo().getHostName());
+                        }
                         liveRoomService.liveUpdateByRoomId(liveData, liveClient.getRoomInfo().getRoomId());
-                        disconnect(liveClient.getRoomInfo().getHostName());
                     }
                 })
                 .onComment((liveClient, event) -> {
