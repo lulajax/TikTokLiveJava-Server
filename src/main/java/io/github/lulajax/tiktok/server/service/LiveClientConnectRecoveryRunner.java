@@ -1,6 +1,7 @@
 package io.github.lulajax.tiktok.server.service;
 
 import com.xxl.job.core.util.IpUtil;
+import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveRequestException;
 import io.github.jwdeveloper.tiktok.models.ConnectionState;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -26,6 +27,8 @@ public class LiveClientConnectRecoveryRunner implements ApplicationRunner {
                 .forEach(x -> {
                     try {
                         liveClientService.createClientConnect(x.getHostName());
+                    } catch (TikTokLiveRequestException e) {
+                        log.info("初始化客户端socket连接池失败 hostName:{}", x.getHostName(), e);
                     } catch (Exception e) {
                         log.error("初始化客户端socket连接池失败 hostName:{}", x.getHostName(), e);
                     }

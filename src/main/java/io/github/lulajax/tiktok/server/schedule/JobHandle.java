@@ -4,6 +4,7 @@ import cn.hutool.core.thread.ThreadUtil;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.util.IpUtil;
+import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveRequestException;
 import io.github.lulajax.tiktok.server.data.LiveClientConnect;
 import io.github.lulajax.tiktok.server.service.LiveClientService;
 import io.github.lulajax.tiktok.server.service.LiveRoomService;
@@ -59,6 +60,8 @@ public class JobHandle {
                 ThreadUtil.safeSleep(3000);
             }
             liveClientService.setUserStatus(x.getHostName(), liveUserData.getUserStatus().name());
+        } catch (TikTokLiveRequestException e) {
+            log.info("开播监控启动失败 hostName:{}", x.getHostName(), e);
         } catch (Exception e) {
             log.error("开播监控启动失败 hostName:{}", x.getHostName(), e);
         }
