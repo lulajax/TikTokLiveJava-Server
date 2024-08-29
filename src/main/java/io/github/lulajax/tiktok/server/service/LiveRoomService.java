@@ -33,8 +33,8 @@ public class LiveRoomService {
         if (liveRoom == null) {
             liveRoom = new LiveRoom().buildFrom(liveClient.getRoomInfo());
             liveRoom.setEndTime(DateUtil.currentSeconds());
+            liveRoomRepository.save(liveRoom);
         }
-        liveRoomRepository.save(liveRoom);
     }
 
     public void liveUpdateByRoomId(LiveData.Response liveData, String roomId) {
