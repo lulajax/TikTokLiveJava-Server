@@ -32,8 +32,8 @@ public class LiveRoomService {
         LiveRoom liveRoom = liveRoomRepository.findByRoomId(roomId);
         if (liveRoom == null) {
             liveRoom = new LiveRoom().buildFrom(liveClient.getRoomInfo());
+            liveRoom.setEndTime(DateUtil.currentSeconds());
         }
-        liveRoom.setEndTime(DateUtil.currentSeconds());
         liveRoomRepository.save(liveRoom);
     }
 
