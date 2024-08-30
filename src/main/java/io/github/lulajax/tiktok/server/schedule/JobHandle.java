@@ -52,10 +52,7 @@ public class JobHandle {
                 var liveData = liveClientService.getLiveData(liveUserData.getRoomId());
                 liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
                 liveClientService.createClientConnect(x.getHostName(), liveUserData.getRoomId());
-            } else if (liveUserData.isHostNameValid()){
-                log.info("hostName:{} 不在直播中", x.getHostName());
-                liveClientService.disconnect(x.getHostName());
-            } else {
+            } else if (!liveUserData.isHostNameValid()) {
                 log.info("hostName:{} 不存在", x.getHostName());
                 ThreadUtil.safeSleep(3000);
             }
