@@ -54,7 +54,7 @@ public class JobHandle {
                 liveClientService.createClientConnect(x.getHostName(), liveUserData.getRoomId());
             } else if (!liveUserData.isHostNameValid()) {
                 log.info("hostName:{} 不存在", x.getHostName());
-                ThreadUtil.safeSleep(3000);
+                ThreadUtil.safeSleep(6000);
             }
             liveClientService.setUserStatus(x.getHostName(), liveUserData.getUserStatus().name());
         } catch (TikTokLiveRequestException e) {
