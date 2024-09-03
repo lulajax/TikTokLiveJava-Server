@@ -39,12 +39,11 @@ public class JobHandle {
     public void checkLiveClientFast() {
         String param = XxlJobHelper.getJobParam();
         log.info("Checking clients fast: {}", param);
-        Arrays.asList(param.split(",")).forEach(hostName -> {
-            var x = liveClientService.getClientConnect(hostName);
-            if (x != null && IpUtil.getIp().equals(x.getServerIp()) && !x.isDeleted()) {
-                createClientConnect(x);
-            }
-        });
+        liveClientService.getClientConnectList(null).stream()
+                .filter(x -> IpUtil.getIp().equals(x.getServerIp()))
+                .filter(x -> !x.isDeleted())
+                .filter(x -> x.getPriorityMonitor() != null && x.getPriorityMonitor() == 1)
+                .forEach(this::createClientConnect);
     }
 
     private final Map<String, Boolean> lastConnectStatus = new HashMap<>();
