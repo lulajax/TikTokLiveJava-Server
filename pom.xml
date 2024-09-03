@@ -18,7 +18,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <jwdeveloper.tiktok.version>1.8.6-Release</jwdeveloper.tiktok.version>
+        <jwdeveloper.tiktok.version>1.8.7-Release</jwdeveloper.tiktok.version>
     </properties>
     <dependencies>
         <dependency>
