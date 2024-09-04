@@ -35,7 +35,7 @@ public class LiveClientController {
     @GetMapping("/disconnect")
     public CommonResult<LiveClientConnect> disconnect(@RequestParam("hostName") String hostName) {
         try {
-            return CommonResult.success(liveClientService.disconnect(hostName));
+            return CommonResult.success(liveClientService.disconnect(hostName, "调用接口主动断开"));
         } catch (TikTokLiveException e) {
             return CommonResult.failed(e.getMessage());
         }

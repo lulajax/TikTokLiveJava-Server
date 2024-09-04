@@ -60,7 +60,7 @@ public class JobHandle {
                 log.info("createClientConnect hostName:{} 不在直播中", x.getHostName());
                 // 连续两次检测到未开播，断开连接
                 if (lastConnectStatus.containsKey(x.getHostName()) && !lastConnectStatus.get(x.getHostName())) {
-                    liveClientService.disconnect(x.getHostName());
+                    liveClientService.disconnect(x.getHostName(), "连续两次检测到未开播，断开连接");
                 }
             } else {
                 log.info("createClientConnect hostName:{} 不存在", x.getHostName());

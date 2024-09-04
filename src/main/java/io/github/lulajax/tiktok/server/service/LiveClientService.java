@@ -159,7 +159,7 @@ public class LiveClientService {
                     if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
                         var liveData = getLiveData(liveClient.getRoomInfo().getRoomId());
                         liveRoomService.liveUpdateByRoomId(liveData, liveClient.getRoomInfo().getRoomId());
-                        disconnect(liveClient.getRoomInfo().getHostName());
+                        disconnect(liveClient.getRoomInfo().getHostName(), "");
                     }
                 })
                 .onComment((liveClient, event) -> {
@@ -210,7 +210,7 @@ public class LiveClientService {
 
             LiveClientConnect newClient = new LiveClientConnect().buildFrom(client.getRoomInfo());
             if (!StringUtils.hasLength(newClient.getHostName()) || newClient.getHostId() == null){
-                disconnect(hostName);
+                disconnect(hostName, "Host name is not valid");
                 throw new TikTokLiveRequestException("Host name is not valid");
             }
 
@@ -223,13 +223,13 @@ public class LiveClientService {
             }
         } catch (TikTokLiveOfflineHostException e) {
             log.info("{} Host is offline", hostName);
-            disconnect(hostName);
+            disconnect(hostName, "Host is offline");
             throw e;
         }
     }
 
-    public LiveClientConnect disconnect(String hostName) {
-        log.info("Disconnecting client for: " + hostName);
+    public LiveClientConnect disconnect(String hostName, String reason) {
+        log.info("Disconnecting client for: {}, reason: {}", hostName, reason);
         LiveClient client = liveClientPool.get(hostName);
         if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
             client.disconnect();
