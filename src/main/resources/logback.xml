@@ -6,7 +6,7 @@
     <property name="log_dir" value="./logs" />
     <!-- 日志最大的历史 30天 -->
     <property name="maxHistory" value="30" />
-    <property name="maxFileSize" value="50MB" />
+    <property name="maxFileSize" value="100MB" />
 
     <!--输出到控制台-->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
@@ -31,7 +31,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--日志输出位置 可相对、和绝对路径 -->
             <fileNamePattern>
-                ${log_dir}/%d{yyyy-MM-dd,aux}/error.%d{yyyy-MM-dd}.%i.log
+                ${log_dir}/%d{yyyy-MM-dd,aux}/error.%d{yyyy-MM-dd_HH}.%i.log
             </fileNamePattern>
             <!-- 可选节点，控制保留的归档文件的最大数量，超出数量就删除旧文件假设设置每个月滚动，且<maxHistory>是6， 则只保存最近6个月的文件，删除之前的旧文件。注意，删除旧文件是，那些为了归档而创建的目录也会被删除 -->
             <maxHistory>${maxHistory}</maxHistory>
