@@ -66,7 +66,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 按天回滚 daily -->
             <fileNamePattern>
-                ${log_dir}/%d{yyyy-MM-dd,aux}/info.%d{yyyy-MM-dd}.%i.log
+                ${log_dir}/%d{yyyy-MM-dd,aux}/info.%d{yyyy-MM-dd_HH}.%i.log
             </fileNamePattern>
             <!-- 日志最大的历史 60天 -->
             <maxHistory>${maxHistory}</maxHistory>
