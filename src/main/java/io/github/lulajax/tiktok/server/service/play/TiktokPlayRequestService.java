@@ -55,7 +55,7 @@ public class TiktokPlayRequestService {
     
 
     private CookieConfig getCookieConfig() {
-        return cookieConfigRepository.findAll().stream().findAny().orElse(null);
+        return cookieConfigRepository.findAll().stream().filter(x -> !x.isDeleted()).findFirst().orElse(null);
     }
 
     private Map<String, String> getHeaders(String cookie) {
