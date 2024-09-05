@@ -36,6 +36,9 @@ public class CookieConfig implements Serializable {
     @Column(name = "update_time_stamp")
     private Long updateTimeStamp;
 
+    @Column(name = "region")
+    private String region;
+
     @Column(name = "deleted")
     private boolean deleted;
 }
