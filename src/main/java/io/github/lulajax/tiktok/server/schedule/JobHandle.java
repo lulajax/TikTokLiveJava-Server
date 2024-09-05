@@ -37,12 +37,11 @@ public class JobHandle {
 
     @XxlJob("checkLiveClientFast")
     public void checkLiveClientFast() {
-        String param = XxlJobHelper.getJobParam();
-        log.info("Checking clients fast: {}", param);
         liveClientService.getClientConnectList(null).stream()
                 .filter(x -> IpUtil.getIp().equals(x.getServerIp()))
                 .filter(x -> !x.isDeleted())
                 .filter(x -> x.getPriorityMonitor() != null && x.getPriorityMonitor() == 1)
+                .peek(x -> log.info("checkLiveClientFast hostName:{}", x.getHostName()))
                 .forEach(this::createClientConnect);
     }
 
