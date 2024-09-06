@@ -7,6 +7,8 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.util.IpUtil;
 import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveRequestException;
 import io.github.lulajax.tiktok.server.data.LiveClientConnect;
+import io.github.lulajax.tiktok.server.data.pk.PkRound;
+import io.github.lulajax.tiktok.server.data.pk.repository.PkRoundRepository;
 import io.github.lulajax.tiktok.server.service.LiveClientService;
 import io.github.lulajax.tiktok.server.service.LiveRoomService;
 import lombok.AllArgsConstructor;
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -25,6 +29,8 @@ public class JobHandle {
 
     private final LiveClientService liveClientService;
     private final LiveRoomService liveRoomService;
+    private final PkRoundRepository pkRoundRepository;
+
 
     @XxlJob("checkLiveClient")
     public void checkLiveClient() {
@@ -42,6 +48,20 @@ public class JobHandle {
                 .filter(x -> !x.isDeleted())
                 .filter(x -> x.getPriorityMonitor() != null && x.getPriorityMonitor() == 1)
                 .peek(x -> log.info("checkLiveClientFast hostName:{}", x.getHostName()))
+                .forEach(this::createClientConnect);
+    }
+
+    @XxlJob("checkLiveClientPKing")
+    public void checkLiveClientPKing() {
+        List<String> liveClientPKingHosts = pkRoundRepository.findAllPkingRoundList().stream().map(PkRound::getHostName).toList();
+        if (liveClientPKingHosts.isEmpty()) {
+            log.info("checkLiveClientPKing 没有PK中的直播间");
+            return;
+        }
+        liveClientService.getClientConnects(liveClientPKingHosts).stream()
+                .filter(x -> IpUtil.getIp().equals(x.getServerIp()))
+                .filter(x -> !x.isDeleted())
+                .peek(x -> log.info("checkLiveClientPKing hostName:{}", x.getHostName()))
                 .forEach(this::createClientConnect);
     }
 

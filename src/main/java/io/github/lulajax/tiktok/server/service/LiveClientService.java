@@ -229,9 +229,9 @@ public class LiveClientService {
     }
 
     public LiveClientConnect disconnect(String hostName, String reason) {
-        log.info("Disconnecting client for: {}, reason: {}", hostName, reason);
         LiveClient client = liveClientPool.get(hostName);
         if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
+            log.info("Disconnecting client for: {}, reason: {}", hostName, reason);
             client.disconnect();
             liveClientPool.put(hostName, client);
         }
@@ -319,8 +319,8 @@ public class LiveClientService {
         }
     }
 
-    public LiveClientConnect getClientConnect(String hostName) {
-        return liveClientRepository.findByHostName(hostName);
+    public List<LiveClientConnect> getClientConnects(List<String> hostNames) {
+        return liveClientRepository.findAllByHostNameIn(hostNames);
     }
 
     public List<ConnectLog> getConnectLogList(String roomId) {
