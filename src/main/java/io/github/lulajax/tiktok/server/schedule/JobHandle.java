@@ -49,7 +49,7 @@ public class JobHandle {
         liveClientService.getClientConnectList(null).stream()
                 .filter(x -> IpUtil.getIp().equals(x.getServerIp()))
                 .filter(x -> !x.isDeleted())
-                .filter(x -> x.getPriorityMonitor() != null && x.getPriorityMonitor() == 1)
+                .filter(x -> x.getPriorityMonitor() != null && (x.getPriorityMonitor() == 1 || x.getPriorityMonitor() == 3))
                 .peek(x -> log.info("checkLiveClientFast hostName:{}", x.getHostName()))
                 .forEach(this::createClientConnect);
     }
@@ -64,6 +64,7 @@ public class JobHandle {
         liveClientService.getClientConnects(liveClientPKingHosts).stream()
                 .filter(x -> IpUtil.getIp().equals(x.getServerIp()))
                 .filter(x -> !x.isDeleted())
+                .filter(x -> x.getPriorityMonitor() != null && x.getPriorityMonitor() == 3)
                 .peek(x -> log.info("checkLiveClientPKing hostName:{}", x.getHostName()))
                 .forEach(this::createClientConnect);
     }

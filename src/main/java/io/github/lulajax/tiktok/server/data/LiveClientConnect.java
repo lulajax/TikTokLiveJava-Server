@@ -46,7 +46,7 @@ public class LiveClientConnect {
     private boolean deleted;
 
     /**
-     * 开播监控优先级，1：重点监控 1分钟扫描一次，2：普通监控 5分钟扫描一次
+     * 开播监控优先级，1：重点监控 1分钟扫描一次，2：普通监控 5分钟扫描一次，3：PK 监控 1分钟扫描一次
      */
     private Integer priorityMonitor = 2;
 
