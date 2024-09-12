@@ -236,9 +236,6 @@ public class LiveClientService {
         if (connect == null) {
             return null;
         }
-        if (!IpUtil.getIp().equals(connect.getServerIp())) {
-            throw new TikTokLiveRequestException("Client is created by other server");
-        }
         connect.setConnectionState(ConnectionState.DISCONNECTED.name());
         return liveClientRepository.save(connect);
     }
@@ -257,9 +254,6 @@ public class LiveClientService {
             if (clientInfo == null) {
                 clientInfo = new LiveClientConnect().buildFrom(liveUserData);
             } else {
-                if (!IpUtil.getIp().equals(clientInfo.getServerIp())) {
-                    throw new TikTokLiveRequestException("Client is created by other server");
-                }
                 clientInfo.buildFrom(liveUserData);
             }
             return liveClientRepository.save(clientInfo);
@@ -277,9 +271,6 @@ public class LiveClientService {
 
         LiveClientConnect connect = liveClientRepository.findByHostName(hostName);
         if (connect != null) {
-            if (!IpUtil.getIp().equals(connect.getServerIp())) {
-                throw new TikTokLiveRequestException("Client is created by other server");
-            }
             try {
                 liveClientRepository.delete(connect);
                 // 删除相关数据
