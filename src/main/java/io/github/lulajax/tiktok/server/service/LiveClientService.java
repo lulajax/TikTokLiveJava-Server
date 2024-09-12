@@ -233,7 +233,7 @@ public class LiveClientService {
         if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
             log.info("Disconnecting client for: {}, reason: {}, ConnectionState: {}", hostName, reason, client.getRoomInfo().getConnectionState());
             client.disconnect();
-            liveClientPool.put(hostName, client);
+            liveClientPool.remove(hostName);
         }
         LiveClientConnect connect = liveClientRepository.findByHostName(hostName);
         if (connect == null) {
