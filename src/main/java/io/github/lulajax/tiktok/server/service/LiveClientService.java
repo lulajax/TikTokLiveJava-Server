@@ -126,9 +126,6 @@ public class LiveClientService {
             }
         }
         LiveClientConnect clientConnect = liveClientRepository.findByHostName(hostName);
-        if (clientConnect != null && !IpUtil.getIp().equals(clientConnect.getServerIp())) {
-            throw new TikTokLiveRequestException("Client is created by other server");
-        }
 
         client = TikTokLive.newClient(hostName)
                 .configure(liveClientSettings -> {
