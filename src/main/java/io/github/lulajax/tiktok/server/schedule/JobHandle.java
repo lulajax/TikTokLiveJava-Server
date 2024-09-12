@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.net.http.HttpTimeoutException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -88,7 +89,12 @@ public class JobHandle {
             liveClientService.setUserStatus(x.getHostName(), liveUserData.getUserStatus().name());
             lastConnectStatus.put(x.getHostName(), liveUserData.isLiveOnline());
         } catch (TikTokLiveRequestException e) {
-            log.info("开播监控启动失败 hostName:{}", x.getHostName(), e);
+            if (e.getCause() instanceof HttpTimeoutException) {
+                log.error("开播监控启动失败 请求超超时 hostName:{}", x.getHostName(), e);
+                ThreadUtil.safeSleep(6000);
+            } else {
+                log.info("开播监控启动失败 hostName:{}", x.getHostName(), e);
+            }
         } catch (Exception e) {
             log.error("开播监控启动失败 hostName:{}", x.getHostName(), e);
         }

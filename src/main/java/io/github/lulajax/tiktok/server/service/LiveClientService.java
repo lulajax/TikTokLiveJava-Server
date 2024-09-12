@@ -153,7 +153,7 @@ public class LiveClientService {
                     liveRoomService.liveStartUpdate(liveClient);
                 })
                 .onDisconnected((liveClient, event) -> {
-                    log.info("{} Disconnected {}", liveClient.getRoomInfo().getHostName(), event.getReason());
+                    log.info("{} Disconnected {} ConnectionState:{}", liveClient.getRoomInfo().getHostName(), event.getReason(), liveClient.getRoomInfo().getConnectionState());
                     Long hostId = clientConnect != null && clientConnect.getHostId() != null ? clientConnect.getHostId() : liveClient.getRoomInfo().getHost().getId();
                     ThreadUtil.execAsync(() -> connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), hostId, hostName, ConnectionState.DISCONNECTED.toString())));
                     if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
@@ -231,7 +231,7 @@ public class LiveClientService {
     public LiveClientConnect disconnect(String hostName, String reason) {
         LiveClient client = liveClientPool.get(hostName);
         if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
-            log.info("Disconnecting client for: {}, reason: {}", hostName, reason);
+            log.info("Disconnecting client for: {}, reason: {}, ConnectionState: {}", hostName, reason, client.getRoomInfo().getConnectionState());
             client.disconnect();
             liveClientPool.put(hostName, client);
         }
