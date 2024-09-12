@@ -39,6 +39,8 @@ public class JobHandle {
         liveClientService.getClientConnectList(null).stream()
                 .filter(x -> IpUtil.getIp().equals(x.getServerIp()))
                 .filter(x -> !x.isDeleted())
+                .filter(x -> x.getPriorityMonitor() == null || x.getPriorityMonitor() == 2)
+                .peek(x -> log.info("checkLiveClient hostName:{}", x.getHostName()))
                 .forEach(this::createClientConnect);
     }
 
