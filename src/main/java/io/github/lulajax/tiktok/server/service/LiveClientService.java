@@ -109,23 +109,28 @@ public class LiveClientService {
         return createClientConnect(hostName, null);
     }
     public LiveClientConnect createClientConnect(String hostName, String roomId) {
+        LiveClientConnect clientConnect = liveClientRepository.findByHostName(hostName);
+        if (clientConnect != null && !StringUtils.hasLength(roomId)) {
+            roomId = clientConnect.getRoomId();
+        }
+
         log.info("Creating new client for: " + hostName);
         LiveClient client = liveClientPool.get(hostName);
-        if (client != null && client.getRoomInfo().getRoomId().equals(roomId)) {
-            if (ConnectionState.CONNECTED.equals(client.getRoomInfo().getConnectionState())) {
-                log.info("Client is already connected");
-                throw new TikTokLiveRequestException("Client is already connected");
-            } else if (ConnectionState.CONNECTING.equals(client.getRoomInfo().getConnectionState())) {
-                log.info("Client is connecting");
-                throw new TikTokLiveRequestException("Client is connecting");
-            }
-        } else if (client != null && StringUtils.hasLength(roomId) && !client.getRoomInfo().getRoomId().equals(roomId)) {
-            // 换了一场房间，把旧的连接关闭
-            if (!ConnectionState.CONNECTED.equals(client.getRoomInfo().getConnectionState())) {
-                client.disconnect();
+        if (client != null) {
+            if (client.getRoomInfo().getRoomId().equals(roomId)) {
+                if (ConnectionState.CONNECTED.equals(client.getRoomInfo().getConnectionState())) {
+                    log.info("Client is already connected");
+                    throw new TikTokLiveRequestException("Client is already connected");
+                } else if (ConnectionState.CONNECTING.equals(client.getRoomInfo().getConnectionState())) {
+                    log.info("Client is connecting");
+                    throw new TikTokLiveRequestException("Client is connecting");
+                }
+            } else {
+                log.info("Client is not connected to the same room");
+                disconnect(hostName, "房间变了,关闭旧的连接");
             }
         }
-        LiveClientConnect clientConnect = liveClientRepository.findByHostName(hostName);
+
 
         client = TikTokLive.newClient(hostName)
                 .configure(liveClientSettings -> {
@@ -230,7 +235,6 @@ public class LiveClientService {
         if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
             log.info("Disconnecting client for: {}, reason: {}, ConnectionState: {}", hostName, reason, client.getRoomInfo().getConnectionState());
             client.disconnect();
-            liveClientPool.remove(hostName);
         }
         LiveClientConnect connect = liveClientRepository.findByHostName(hostName);
         if (connect == null) {
