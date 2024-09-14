@@ -161,6 +161,8 @@ public class LiveClientService {
                 } else if (ConnectionState.CONNECTING.equals(client.getRoomInfo().getConnectionState())) {
                     log.info("{} Client is connecting", hostName);
                     throw new TikTokLiveRequestException("Client is connecting");
+                } else {
+                    log.info("{} Client is disconnected, new roomId:{}, old roomId:{}", hostName, roomId, client.getRoomInfo().getRoomId());
                 }
             } else {
                 log.info("{} Client is not connected to the same room, new roomId:{}, old roomId:{}", hostName, roomId, client.getRoomInfo().getRoomId());
@@ -288,6 +290,7 @@ public class LiveClientService {
                 if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
                     log.info("disconnect client for: {}, reason: {}, ConnectionState: {}", hostName, reason, client.getRoomInfo().getConnectionState());
                     client.disconnect();
+                    return updateDisconnectedState(hostName);
                 } else {
                     log.info("disconnect client for: {}, is already disconnected", hostName);
                     return liveClientRepository.findByHostName(hostName);
@@ -298,7 +301,7 @@ public class LiveClientService {
         } finally {
             disconnectClientLock.unlock();
         }
-        return updateDisconnectedState(hostName);
+        return liveClientRepository.findByHostName(hostName);
     }
 
     private LiveClientConnect updateDisconnectedState(String hostName) {
