@@ -26,7 +26,7 @@ public class LiveClientConnectRecoveryRunner implements ApplicationRunner {
                 .filter(x -> ConnectionState.CONNECTED.name().equals(x.getConnectionState()))
                 .forEach(x -> {
                     try {
-                        liveClientService.createClientConnect(x.getHostName());
+                        liveClientService.createClientConnect(x.getHostName(), x.getRoomId());
                     } catch (TikTokLiveRequestException e) {
                         log.info("初始化客户端socket连接池失败 hostName:{}", x.getHostName(), e);
                     } catch (Exception e) {

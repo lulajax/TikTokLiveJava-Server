@@ -105,9 +105,6 @@ public class LiveClientService {
         return httpClient;
     }
 
-    public LiveClientConnect createClientConnect(String hostName) {
-        return createClientConnect(hostName, null);
-    }
     public LiveClientConnect createClientConnect(String hostName, String roomId) {
         LiveClientConnect clientConnect = liveClientRepository.findByHostName(hostName);
         if (clientConnect != null && !StringUtils.hasLength(roomId)) {
@@ -126,7 +123,7 @@ public class LiveClientService {
                     throw new TikTokLiveRequestException("Client is connecting");
                 }
             } else {
-                log.info("{} Client is not connected to the same room", hostName);
+                log.info("{} Client is not connected to the same room, new roomId:{}, old roomId:{}", hostName, roomId, client.getRoomInfo().getRoomId());
                 disconnect(hostName, "房间变了,关闭旧的连接");
             }
         }
@@ -261,7 +258,7 @@ public class LiveClientService {
         }
 
         if (liveUserData.isLiveOnline()) {
-            return createClientConnect(hostName);
+            return createClientConnect(hostName, liveUserData.getRoomId());
         } else {
             LiveClientConnect clientInfo = liveClientRepository.findByHostName(hostName);
             if (clientInfo == null) {

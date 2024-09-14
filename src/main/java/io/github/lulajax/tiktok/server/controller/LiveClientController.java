@@ -24,9 +24,9 @@ public class LiveClientController {
     private final LiveClientService liveClientService;
 
     @GetMapping("/connect")
-    public CommonResult<LiveClientConnect> createClientConnect(@RequestParam("hostName") String hostName) {
+    public CommonResult<LiveClientConnect> createClientConnect(@RequestParam("hostName") String hostName, @RequestParam(value = "roomId", required = false) String roomId) {
         try {
-            return CommonResult.success(liveClientService.createClientConnect(hostName));
+            return CommonResult.success(liveClientService.createClientConnect(hostName, roomId));
         } catch (TikTokLiveException e) {
             return CommonResult.failed(e.getMessage());
         }
