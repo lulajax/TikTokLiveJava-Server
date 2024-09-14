@@ -225,6 +225,10 @@ public class LiveClientService {
                     ThreadUtil.execAsync(() -> connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), hostId, hostName, ConnectionState.CONNECTED.toString())));
                     liveRoomService.liveStartUpdate(liveClient);
                 })
+                .onLiveEnded((liveClient, event) -> {
+                    log.info("{} LiveEnded", liveClient.getRoomInfo().getHostName());
+                    disconnect(liveClient.getRoomInfo().getHostName(), "直播结束");
+                })
                 .onDisconnected((liveClient, event) -> {
                     log.info("{} Disconnected {} ConnectionState:{}", liveClient.getRoomInfo().getHostName(), event.getReason(), liveClient.getRoomInfo().getConnectionState());
                     Long hostId = clientConnect != null && clientConnect.getHostId() != null ? clientConnect.getHostId() : liveClient.getRoomInfo().getHost().getId();

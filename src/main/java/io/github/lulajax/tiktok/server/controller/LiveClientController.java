@@ -31,7 +31,7 @@ public class LiveClientController {
             return CommonResult.failed(e.getMessage());
         }
     }
-    
+
     @GetMapping("/connect/bySchedule")
     public CommonResult<LiveClientConnect> createClientConnectBySchedule(@RequestParam("hostName") String hostName) {
         try {
