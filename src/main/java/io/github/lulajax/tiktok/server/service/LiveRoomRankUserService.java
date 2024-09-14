@@ -26,8 +26,12 @@ public class LiveRoomRankUserService {
             if (rankUser.getUser() == null || rankUser.getScore() <= 0) {
                 continue;
             }
-            var user = getLiveRoomRankUser(roomInfo, rankUser, timeStamp);
-            liveRoomRankUserRepository.save(user);
+            try {
+                var user = getLiveRoomRankUser(roomInfo, rankUser, timeStamp);
+                liveRoomRankUserRepository.save(user);
+            } catch (Exception e) {
+                log.error("Error while saving room rank user", e);
+            }
         }
         updateRoomLiveData(roomInfo);
     }

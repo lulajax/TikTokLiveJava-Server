@@ -19,7 +19,7 @@ public class LiveRoomRankUser {
     private Long hostId;
     private String hostName;
 
-    @Column(name = "`rank`")
+    @Column(name = "rank_value")
     private Integer rank;
     private Integer score;
     private Long userId;

@@ -2,7 +2,6 @@ package io.github.lulajax.tiktok.server.service;
 
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.json.JSONUtil;
-import com.xxl.job.core.util.IpUtil;
 import io.github.jwdeveloper.tiktok.TikTokLive;
 import io.github.jwdeveloper.tiktok.TikTokLiveHttpClient;
 import io.github.jwdeveloper.tiktok.data.requests.GiftsData;
@@ -120,14 +119,14 @@ public class LiveClientService {
         if (client != null) {
             if (client.getRoomInfo().getRoomId().equals(roomId)) {
                 if (ConnectionState.CONNECTED.equals(client.getRoomInfo().getConnectionState())) {
-                    log.info("Client is already connected");
+                    log.info("{} Client is already connected", hostName);
                     throw new TikTokLiveRequestException("Client is already connected");
                 } else if (ConnectionState.CONNECTING.equals(client.getRoomInfo().getConnectionState())) {
-                    log.info("Client is connecting");
+                    log.info("{} Client is connecting", hostName);
                     throw new TikTokLiveRequestException("Client is connecting");
                 }
             } else {
-                log.info("Client is not connected to the same room");
+                log.info("{} Client is not connected to the same room", hostName);
                 disconnect(hostName, "房间变了,关闭旧的连接");
             }
         }
@@ -163,7 +162,7 @@ public class LiveClientService {
                     if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
                         var liveData = getLiveData(liveClient.getRoomInfo().getRoomId());
                         liveRoomService.liveUpdateByRoomId(liveData, liveClient.getRoomInfo().getRoomId());
-                        disconnect(liveClient.getRoomInfo().getHostName(), "");
+                        updateDisconnectedState(hostName);
                     }
                 })
                 .onComment((liveClient, event) -> {
@@ -208,7 +207,7 @@ public class LiveClientService {
 
         try {
             client.connect();
-            // wait for connection
+            log.info("Creating new client for: {}, roomInfo: {}", hostName, client.getRoomInfo());
             ThreadUtil.safeSleep(5000);
             liveClientPool.put(hostName, client);
 
@@ -233,11 +232,19 @@ public class LiveClientService {
     }
 
     public LiveClientConnect disconnect(String hostName, String reason) {
+        log.info("disconnect client for: {}, reason: {}", hostName, reason);
         LiveClient client = liveClientPool.get(hostName);
         if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
-            log.info("Disconnecting client for: {}, reason: {}, ConnectionState: {}", hostName, reason, client.getRoomInfo().getConnectionState());
+            log.info("disconnect client for: {}, reason: {}, ConnectionState: {}", hostName, reason, client.getRoomInfo().getConnectionState());
             client.disconnect();
+        } else {
+            log.info("disconnect client for: {}, is already disconnected", hostName);
         }
+        return updateDisconnectedState(hostName);
+    }
+
+    private LiveClientConnect updateDisconnectedState(String hostName) {
+        log.info("updateDisconnectedState for: {}", hostName);
         LiveClientConnect connect = liveClientRepository.findByHostName(hostName);
         if (connect == null) {
             return null;
