@@ -33,9 +33,12 @@ import org.springframework.util.StringUtils;
 
 import java.net.Proxy;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @Slf4j
@@ -62,7 +65,8 @@ public class LiveClientService {
     private int proxyPort;
     @Value("${eulerstream.api.key:MTliNDBhOTJhMTU3Mjcz}")
     private String apiKey;
-
+    private final Lock connectClientLock = new ReentrantLock();
+    private final Lock disconnectClientLock = new ReentrantLock();
 
     public LiveClientService(LiveRoomService liveRoomService,
                              LiveClientConnectRepository liveClientRepository,
@@ -76,7 +80,7 @@ public class LiveClientService {
         this.connectLogRepository = connectLogRepository;
         this.giftMsgRepository = giftMsgRepository;
         this.commentRepository = commentRepository;
-        this.liveClientPool = new HashMap<>();
+        this.liveClientPool = new ConcurrentHashMap<>();
         this.liveRoomRankUserService = liveRoomRankUserService;
         this.applicationEventPublisher = applicationEventPublisher;
     }
@@ -129,7 +133,40 @@ public class LiveClientService {
         }
 
         log.info("start Creating new client for: " + hostName);
-        client = TikTokLive.newClient(hostName)
+        client = newClient(hostName, clientConnect);
+        try {
+            if (connectClientLock.tryLock(10, TimeUnit.SECONDS)) {
+                client.connect();
+                log.info("done Creating new client for: {}, roomInfo: {}", hostName, client.getRoomInfo());
+                liveClientPool.put(hostName, client);
+            }
+            ThreadUtil.safeSleep(3000);
+        } catch (TikTokLiveOfflineHostException e) {
+            log.info("error Creating new client for: {}, Host is offline", hostName);
+            throw e;
+        } catch (InterruptedException e) {
+            log.error("error Creating new client for: {}, try lock error", hostName);
+        } finally {
+            connectClientLock.unlock();
+        }
+
+        LiveClientConnect newClient = new LiveClientConnect().buildFrom(client.getRoomInfo());
+        if (!StringUtils.hasLength(newClient.getHostName()) || newClient.getHostId() == null){
+            disconnect(hostName, "Host name is not valid");
+            throw new TikTokLiveRequestException("Host name is not valid");
+        }
+
+        LiveClientConnect clientInfo = liveClientRepository.findByHostId(newClient.getHostId());
+        if (clientInfo == null) {
+            return liveClientRepository.save(newClient);
+        } else {
+            clientInfo.buildFrom(client.getRoomInfo());
+            return liveClientRepository.save(clientInfo);
+        }
+    }
+
+    private LiveClient newClient(String hostName, LiveClientConnect clientConnect) {
+        return TikTokLive.newClient(hostName)
                 .configure(liveClientSettings -> {
                     liveClientSettings.setApiKey(apiKey);
                     liveClientSettings.setOffline(false);
@@ -191,7 +228,7 @@ public class LiveClientService {
                     }
                 })
                 .onRoomInfo((liveClient, event) -> {
-                    log.info("{} New Room Info: " + JSONUtil.toJsonStr(event.getRoomInfo()), liveClient.getRoomInfo().getHostName());
+//                    log.info("{} New Room Info: " + JSONUtil.toJsonStr(event.getRoomInfo()), liveClient.getRoomInfo().getHostName());
                     liveRoomRankUserService.updateRoomRankList(event.getRoomInfo());
                 })
                 .onJoin((liveClient, event) -> {
@@ -201,41 +238,25 @@ public class LiveClientService {
                     log.error("{} Error: {}", liveClient.getRoomInfo().getHostName(), event.getException().getMessage());
                 })
                 .build();
-
-        try {
-            client.connect();
-            log.info("done Creating new client for: {}, roomInfo: {}", hostName, client.getRoomInfo());
-            ThreadUtil.safeSleep(5000);
-            liveClientPool.put(hostName, client);
-
-            LiveClientConnect newClient = new LiveClientConnect().buildFrom(client.getRoomInfo());
-            if (!StringUtils.hasLength(newClient.getHostName()) || newClient.getHostId() == null){
-                disconnect(hostName, "Host name is not valid");
-                throw new TikTokLiveRequestException("Host name is not valid");
-            }
-
-            LiveClientConnect clientInfo = liveClientRepository.findByHostId(newClient.getHostId());
-            if (clientInfo == null) {
-                return liveClientRepository.save(newClient);
-            } else {
-                clientInfo.buildFrom(client.getRoomInfo());
-                return liveClientRepository.save(clientInfo);
-            }
-        } catch (TikTokLiveOfflineHostException e) {
-            log.info("error Creating new client for: {}, Host is offline", hostName);
-            throw e;
-        }
     }
 
     public LiveClientConnect disconnect(String hostName, String reason) {
         log.info("disconnect client for: {}, reason: {}", hostName, reason);
-        LiveClient client = liveClientPool.get(hostName);
-        if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
-            log.info("disconnect client for: {}, reason: {}, ConnectionState: {}", hostName, reason, client.getRoomInfo().getConnectionState());
-            client.disconnect();
-        } else {
-            log.info("disconnect client for: {}, is already disconnected", hostName);
-            return liveClientRepository.findByHostName(hostName);
+        try {
+            if (disconnectClientLock.tryLock(10, TimeUnit.SECONDS)) {
+                LiveClient client = liveClientPool.get(hostName);
+                if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
+                    log.info("disconnect client for: {}, reason: {}, ConnectionState: {}", hostName, reason, client.getRoomInfo().getConnectionState());
+                    client.disconnect();
+                } else {
+                    log.info("disconnect client for: {}, is already disconnected", hostName);
+                    return liveClientRepository.findByHostName(hostName);
+                }
+            }
+        } catch (InterruptedException e) {
+            log.error("error disconnect client for: {}, try lock error", hostName);
+        } finally {
+            disconnectClientLock.unlock();
         }
         return updateDisconnectedState(hostName);
     }
