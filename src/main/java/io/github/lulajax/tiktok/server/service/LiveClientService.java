@@ -222,8 +222,7 @@ public class LiveClientService {
                 return liveClientRepository.save(clientInfo);
             }
         } catch (TikTokLiveOfflineHostException e) {
-            log.info("{} Host is offline", hostName);
-            disconnect(hostName, "Host is offline");
+            log.info("error Creating new client for: {}, Host is offline", hostName);
             throw e;
         }
     }
