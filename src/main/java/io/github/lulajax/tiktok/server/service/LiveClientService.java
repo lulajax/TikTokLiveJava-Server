@@ -32,7 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.net.Proxy;
+import java.net.http.HttpTimeoutException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,6 +109,40 @@ public class LiveClientService {
         }
 
         return httpClient;
+    }
+
+    private final Map<String, Boolean> lastConnectStatus = new HashMap<>();
+    public void createClientConnectBySchedule(String hostName) {
+        try {
+            var liveUserData = getLiveUserData(hostName);
+            log.info("createClientConnect hostName:{} data={}", hostName, JSONUtil.toJsonStr(liveUserData));
+            if (liveUserData.isLiveOnline()) {
+                log.info("createClientConnect hostName:{} 正在直播中", hostName);
+                var liveData = getLiveData(liveUserData.getRoomId());
+                liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
+                createClientConnect(hostName, liveUserData.getRoomId());
+            } else if (liveUserData.isHostNameValid()){
+                log.info("createClientConnect hostName:{} 不在直播中", hostName);
+                // 连续两次检测到未开播，断开连接
+                if (lastConnectStatus.containsKey(hostName) && !lastConnectStatus.get(hostName)) {
+                    disconnect(hostName, "连续两次检测到未开播，断开连接");
+                }
+            } else {
+                log.info("createClientConnect hostName:{} 不存在", hostName);
+                ThreadUtil.safeSleep(6000);
+            }
+            setUserStatus(hostName, liveUserData.getUserStatus().name());
+            lastConnectStatus.put(hostName, liveUserData.isLiveOnline());
+        } catch (TikTokLiveRequestException e) {
+            if (e.getCause() instanceof HttpTimeoutException) {
+                log.error("开播监控启动失败 请求超超时 hostName:{}", hostName, e);
+                ThreadUtil.safeSleep(6000);
+            } else {
+                log.info("开播监控启动失败 hostName:{}", hostName, e);
+            }
+        } catch (Exception e) {
+            log.error("开播监控启动失败 hostName:{}", hostName, e);
+        }
     }
 
     public LiveClientConnect createClientConnect(String hostName, String roomId) {

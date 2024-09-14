@@ -31,6 +31,16 @@ public class LiveClientController {
             return CommonResult.failed(e.getMessage());
         }
     }
+    
+    @GetMapping("/connect/bySchedule")
+    public CommonResult<LiveClientConnect> createClientConnectBySchedule(@RequestParam("hostName") String hostName) {
+        try {
+            liveClientService.createClientConnectBySchedule(hostName);
+            return CommonResult.success();
+        } catch (TikTokLiveException e) {
+            return CommonResult.failed(e.getMessage());
+        }
+    }
 
     @GetMapping("/disconnect")
     public CommonResult<LiveClientConnect> disconnect(@RequestParam("hostName") String hostName) {
