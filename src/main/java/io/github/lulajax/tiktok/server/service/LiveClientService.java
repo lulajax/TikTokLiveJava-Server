@@ -114,7 +114,7 @@ public class LiveClientService {
             roomId = clientConnect.getRoomId();
         }
 
-        log.info("Creating new client for: " + hostName);
+        log.info("check Creating new client for: " + hostName);
         LiveClient client = liveClientPool.get(hostName);
         if (client != null) {
             if (client.getRoomInfo().getRoomId().equals(roomId)) {
@@ -131,7 +131,7 @@ public class LiveClientService {
             }
         }
 
-
+        log.info("start Creating new client for: " + hostName);
         client = TikTokLive.newClient(hostName)
                 .configure(liveClientSettings -> {
                     liveClientSettings.setApiKey(apiKey);
@@ -207,7 +207,7 @@ public class LiveClientService {
 
         try {
             client.connect();
-            log.info("Creating new client for: {}, roomInfo: {}", hostName, client.getRoomInfo());
+            log.info("done Creating new client for: {}, roomInfo: {}", hostName, client.getRoomInfo());
             ThreadUtil.safeSleep(5000);
             liveClientPool.put(hostName, client);
 
