@@ -236,6 +236,7 @@ public class LiveClientService {
             client.disconnect();
         } else {
             log.info("disconnect client for: {}, is already disconnected", hostName);
+            return liveClientRepository.findByHostName(hostName);
         }
         return updateDisconnectedState(hostName);
     }
