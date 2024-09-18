@@ -290,7 +290,6 @@ public class LiveClientService {
                 if (client != null && !ConnectionState.DISCONNECTED.equals(client.getRoomInfo().getConnectionState())) {
                     log.info("disconnect client for: {}, reason: {}, ConnectionState: {}", hostName, reason, client.getRoomInfo().getConnectionState());
                     client.disconnect();
-                    return updateDisconnectedState(hostName);
                 } else {
                     log.info("disconnect client for: {}, is already disconnected", hostName);
                     return liveClientRepository.findByHostName(hostName);
@@ -301,7 +300,7 @@ public class LiveClientService {
         } finally {
             disconnectClientLock.unlock();
         }
-        return liveClientRepository.findByHostName(hostName);
+        return updateDisconnectedState(hostName);
     }
 
     private LiveClientConnect updateDisconnectedState(String hostName) {
