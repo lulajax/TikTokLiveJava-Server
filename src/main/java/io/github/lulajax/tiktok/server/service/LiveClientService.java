@@ -4,6 +4,9 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.json.JSONUtil;
 import io.github.jwdeveloper.tiktok.TikTokLive;
 import io.github.jwdeveloper.tiktok.TikTokLiveHttpClient;
+import io.github.jwdeveloper.tiktok.data.events.TikTokLinkMicBattleEvent;
+import io.github.jwdeveloper.tiktok.data.events.envelop.TikTokChestEvent;
+import io.github.jwdeveloper.tiktok.data.events.gift.TikTokGiftEvent;
 import io.github.jwdeveloper.tiktok.data.requests.GiftsData;
 import io.github.jwdeveloper.tiktok.data.requests.LiveData;
 import io.github.jwdeveloper.tiktok.data.requests.LiveUserData;
@@ -275,6 +278,11 @@ public class LiveClientService {
                 })
                 .onJoin((liveClient, event) -> {
                     log.info("{} New Join: {}", liveClient.getRoomInfo().getHostName(), event.getUser());
+                })
+                .onEvent((liveClient, event) -> {
+                    if (event instanceof TikTokLinkMicBattleEvent linkMicBattleEvent) {
+                        log.info("{} New Battle: {}", liveClient.getRoomInfo().getHostName(), JSONUtil.toJsonStr(linkMicBattleEvent));
+                    }
                 })
                 .onError((liveClient, event) -> {
                     log.error("{} Error: {}", liveClient.getRoomInfo().getHostName(), event.getException().getMessage());

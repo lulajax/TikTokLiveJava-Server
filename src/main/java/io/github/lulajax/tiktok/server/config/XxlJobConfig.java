@@ -1,4 +1,4 @@
-package io.github.lulajax.tiktok.server.schedule;
+package io.github.lulajax.tiktok.server.config;
 
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import org.slf4j.Logger;
