@@ -118,8 +118,8 @@ public class LiveClientService {
     public void createClientConnectBySchedule(String hostName) {
         try {
             var liveUserData = getLiveUserData(hostName);
-            log.info("createClientConnect hostName:{} data={}", hostName, JSONUtil.toJsonStr(liveUserData));
             if (liveUserData.isLiveOnline()) {
+                log.info("createClientConnect hostName:{} data={}", hostName, JSONUtil.toJsonStr(liveUserData));
                 log.info("createClientConnect hostName:{} 正在直播中", hostName);
                 var liveData = getLiveData(liveUserData.getRoomId());
                 liveRoomService.liveUpdateByRoomId(liveData, liveUserData.getRoomId());
@@ -131,6 +131,7 @@ public class LiveClientService {
                     disconnect(hostName, "连续两次检测到未开播，断开连接");
                 }
             } else {
+                log.info("createClientConnect hostName:{} data={}", hostName, JSONUtil.toJsonStr(liveUserData));
                 log.info("createClientConnect hostName:{} 不存在", hostName);
                 ThreadUtil.safeSleep(6000);
             }
