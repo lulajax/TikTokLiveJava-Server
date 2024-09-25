@@ -4,6 +4,8 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.json.JSONUtil;
 import io.github.jwdeveloper.tiktok.TikTokLive;
 import io.github.jwdeveloper.tiktok.TikTokLiveHttpClient;
+import io.github.jwdeveloper.tiktok.data.events.TikTokLinkLayerEvent;
+import io.github.jwdeveloper.tiktok.data.events.TikTokLinkMicArmiesEvent;
 import io.github.jwdeveloper.tiktok.data.events.TikTokLinkMicBattleEvent;
 import io.github.jwdeveloper.tiktok.data.events.envelop.TikTokChestEvent;
 import io.github.jwdeveloper.tiktok.data.events.gift.TikTokGiftEvent;
@@ -280,6 +282,10 @@ public class LiveClientService {
                 .onEvent((liveClient, event) -> {
                     if (event instanceof TikTokLinkMicBattleEvent linkMicBattleEvent) {
                         log.info("{} New Battle: {}", liveClient.getRoomInfo().getHostName(), JSONUtil.toJsonStr(linkMicBattleEvent));
+                    } else if (event instanceof TikTokLinkLayerEvent linkLayerEvent) {
+                        log.info("{} New LinkLayer: {}", liveClient.getRoomInfo().getHostName(), JSONUtil.toJsonStr(linkLayerEvent));
+                    } else if (event instanceof TikTokLinkMicArmiesEvent linkMicArmiesEvent) {
+                        log.info("{} New LinkMicArmies: {}", liveClient.getRoomInfo().getHostName(), JSONUtil.toJsonStr(linkMicArmiesEvent));
                     }
                 })
                 .onError((liveClient, event) -> {
