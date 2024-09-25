@@ -1,5 +1,6 @@
 package io.github.lulajax.tiktok.server.data;
 
+import com.xxl.job.core.util.IpUtil;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class ConnectLog {
     private Long hostId;
     private String hostName;
     private String connectionState;
+    private String serverIp;
     private Long timeStamp;
 
     public ConnectLog(String roomId, Long hostId, String hostName, String connectionState) {
@@ -27,6 +29,7 @@ public class ConnectLog {
         this.hostId = hostId;
         this.hostName = hostName;
         this.connectionState = connectionState;
+        this.serverIp = IpUtil.getIp();
         this.timeStamp = System.currentTimeMillis();
     }
 
