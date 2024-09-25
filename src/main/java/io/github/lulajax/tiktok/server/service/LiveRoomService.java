@@ -54,6 +54,14 @@ public class LiveRoomService {
         }
     }
 
+    public void updateLiveEndTime(String roomId) {
+        LiveRoom liveRoom = liveRoomRepository.findByRoomId(roomId);
+        if (liveRoom != null) {
+            liveRoom.setEndTime(DateUtil.currentSeconds());
+            liveRoomRepository.save(liveRoom);
+        }
+    }
+
     public List<LiveRoom> getLiveRooms(String hostName) {
         return liveRoomRepository.findAllByHostName(hostName);
     }

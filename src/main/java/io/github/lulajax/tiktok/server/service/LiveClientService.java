@@ -232,17 +232,14 @@ public class LiveClientService {
                 })
                 .onLiveEnded((liveClient, event) -> {
                     log.info("{} LiveEnded", liveClient.getRoomInfo().getHostName());
+                    liveRoomService.updateLiveEndTime(liveClient.getRoomInfo().getRoomId());
                     disconnect(liveClient.getRoomInfo().getHostName(), "直播结束");
                 })
                 .onDisconnected((liveClient, event) -> {
                     log.info("{} Disconnected {} ConnectionState:{}", liveClient.getRoomInfo().getHostName(), event.getReason(), liveClient.getRoomInfo().getConnectionState());
                     Long hostId = clientConnect != null && clientConnect.getHostId() != null ? clientConnect.getHostId() : liveClient.getRoomInfo().getHost().getId();
                     ThreadUtil.execAsync(() -> connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), hostId, hostName, ConnectionState.DISCONNECTED.toString())));
-                    if (liveClient.getRoomInfo() != null && liveClient.getRoomInfo().getHost() != null) {
-                        var liveData = getLiveData(liveClient.getRoomInfo().getRoomId());
-                        liveRoomService.liveUpdateByRoomId(liveData, liveClient.getRoomInfo().getRoomId());
-                        updateDisconnectedState(hostName);
-                    }
+                    updateDisconnectedState(hostName);
                 })
                 .onComment((liveClient, event) -> {
                     log.info(event.getUser().getName()+": "+event.getText());
