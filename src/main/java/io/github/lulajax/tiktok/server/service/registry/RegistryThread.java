@@ -5,15 +5,15 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import io.github.lulajax.tiktok.server.response.CommonResult;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class RegistryThread {
-    private static Logger logger = LoggerFactory.getLogger(RegistryThread.class);
-
     @Getter
     private static RegistryThread instance = new RegistryThread();
 
@@ -30,16 +30,16 @@ public class RegistryThread {
                         try {
                             CommonResult<String> registryResult = registry(ip, port, serverGroup, registryServerUrl);
                             if (registryResult != null && registryResult.isSuccess()) {
-                                logger.debug(">>>>>>>>>>> live client registry success, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl);
+                                log.debug(">>>>>>>>>>> live client registry success, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl);
                             } else {
-                                logger.info(">>>>>>>>>>> live client registry fail, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl);
+                                log.info(">>>>>>>>>>> live client registry fail, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl);
                             }
                         } catch (Exception e) {
-                            logger.info(">>>>>>>>>>> live client registry error, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl, e);
+                            log.info(">>>>>>>>>>> live client registry error, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl, e);
                         }
                     } catch (Exception e) {
                         if (!toStop) {
-                            logger.error(e.getMessage(), e);
+                            log.error(e.getMessage(), e);
                         }
                     }
 
@@ -49,7 +49,7 @@ public class RegistryThread {
                         }
                     } catch (InterruptedException e) {
                         if (!toStop) {
-                            logger.warn(">>>>>>>>>>> live client, executor registry thread interrupted, error msg:{}", e.getMessage());
+                            log.warn(">>>>>>>>>>> live client, executor registry thread interrupted, error msg:{}", e.getMessage());
                         }
                     }
                 }
@@ -59,21 +59,21 @@ public class RegistryThread {
                     try {
                         CommonResult<String> registryResult = registryRemove(ip, port, registryServerUrl);
                         if (registryResult != null && registryResult.isSuccess()) {
-                            logger.info(">>>>>>>>>>> live client registry-remove success, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl);
+                            log.info(">>>>>>>>>>> live client registry-remove success, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl);
                         } else {
-                            logger.info(">>>>>>>>>>> live client registry-remove fail, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl);
+                            log.info(">>>>>>>>>>> live client registry-remove fail, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl);
                         }
                     } catch (Exception e) {
                         if (!toStop) {
-                            logger.info(">>>>>>>>>>> live client registry-remove error, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl, e);
+                            log.info(">>>>>>>>>>> live client registry-remove error, ip:{}, port:{}, registryServerUrl:{}", ip, port, registryServerUrl, e);
                         }
                     }
                 } catch (Exception e) {
                     if (!toStop) {
-                        logger.error(e.getMessage(), e);
+                        log.error(e.getMessage(), e);
                     }
                 }
-                logger.info(">>>>>>>>>>> live client, executor registry thread destroy.");
+                log.info(">>>>>>>>>>> live client, executor registry thread destroy.");
 
             }
         });
@@ -89,7 +89,7 @@ public class RegistryThread {
             Type type = new TypeReference<CommonResult<String>>(){}.getType();
             return JSONUtil.toBean(response, type, false);
         } catch (Exception e) {
-            logger.error("解析失败: {}", e.getMessage(), e);
+            log.error("解析失败: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -100,7 +100,7 @@ public class RegistryThread {
             Type type = new TypeReference<CommonResult<String>>(){}.getType();
             return JSONUtil.toBean(response, type, false);
         } catch (Exception e) {
-            logger.error("解析失败: {}", e.getMessage(), e);
+            log.error("解析失败: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -114,7 +114,7 @@ public class RegistryThread {
             try {
                 registryThread.join();
             } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
 
