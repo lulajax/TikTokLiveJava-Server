@@ -7,8 +7,6 @@ import io.github.jwdeveloper.tiktok.TikTokLiveHttpClient;
 import io.github.jwdeveloper.tiktok.data.events.TikTokLinkLayerEvent;
 import io.github.jwdeveloper.tiktok.data.events.TikTokLinkMicArmiesEvent;
 import io.github.jwdeveloper.tiktok.data.events.TikTokLinkMicBattleEvent;
-import io.github.jwdeveloper.tiktok.data.events.envelop.TikTokChestEvent;
-import io.github.jwdeveloper.tiktok.data.events.gift.TikTokGiftEvent;
 import io.github.jwdeveloper.tiktok.data.requests.GiftsData;
 import io.github.jwdeveloper.tiktok.data.requests.LiveData;
 import io.github.jwdeveloper.tiktok.data.requests.LiveUserData;
@@ -20,15 +18,13 @@ import io.github.jwdeveloper.tiktok.http.HttpClientFactory;
 import io.github.jwdeveloper.tiktok.http.LiveHttpClient;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import io.github.jwdeveloper.tiktok.models.ConnectionState;
-import io.github.lulajax.tiktok.server.data.CommentMsg;
-import io.github.lulajax.tiktok.server.data.ConnectLog;
-import io.github.lulajax.tiktok.server.data.GiftMsg;
-import io.github.lulajax.tiktok.server.data.LiveClientConnect;
-import io.github.lulajax.tiktok.server.data.repository.CommentMsgRepository;
-import io.github.lulajax.tiktok.server.data.repository.ConnectLogRepository;
-import io.github.lulajax.tiktok.server.data.repository.GiftMsgRepository;
-import io.github.lulajax.tiktok.server.data.repository.LiveClientConnectRepository;
+import io.github.lulajax.tiktok.server.data.*;
+import io.github.lulajax.tiktok.server.data.repository.*;
 import io.github.lulajax.tiktok.server.event.GiftMsgEvent;
+import io.github.lulajax.tiktok.server.service.notification.CustomMsgType;
+import io.github.lulajax.tiktok.server.service.notification.CustomSocketMsg;
+import io.github.lulajax.tiktok.server.service.notification.NotificationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -47,20 +43,23 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class LiveClientService {
-    public LiveHttpClient httpClient;
 
     private final LiveRoomService liveRoomService;
     private final LiveClientConnectRepository liveClientRepository;
     private final ConnectLogRepository connectLogRepository;
     private final GiftMsgRepository giftMsgRepository;
     private final CommentMsgRepository commentRepository;
+    private final EnterRoomMsgRepository enterRoomMsgRepository;
     private final LiveRoomRankUserService liveRoomRankUserService;
+    private final NotificationService notificationService;
     private final ApplicationEventPublisher applicationEventPublisher;
-
-    private final Map<String, LiveClient> liveClientPool;
+    private final Map<String, LiveClient> liveClientPool = new ConcurrentHashMap<>();
+    private final Lock connectClientLock = new ReentrantLock();
+    private final Lock disconnectClientLock = new ReentrantLock();
 
     @Value("${proxy.enable:false}")
     private boolean isProxyEnabled;
@@ -72,25 +71,7 @@ public class LiveClientService {
     private int proxyPort;
     @Value("${eulerstream.api.key:MTliNDBhOTJhMTU3Mjcz}")
     private String apiKey;
-    private final Lock connectClientLock = new ReentrantLock();
-    private final Lock disconnectClientLock = new ReentrantLock();
-
-    public LiveClientService(LiveRoomService liveRoomService,
-                             LiveClientConnectRepository liveClientRepository,
-                             ConnectLogRepository connectLogRepository,
-                             GiftMsgRepository giftMsgRepository,
-                             CommentMsgRepository commentRepository,
-                             LiveRoomRankUserService liveRoomRankUserService,
-                             ApplicationEventPublisher applicationEventPublisher) {
-        this.liveRoomService = liveRoomService;
-        this.liveClientRepository = liveClientRepository;
-        this.connectLogRepository = connectLogRepository;
-        this.giftMsgRepository = giftMsgRepository;
-        this.commentRepository = commentRepository;
-        this.liveClientPool = new ConcurrentHashMap<>();
-        this.liveRoomRankUserService = liveRoomRankUserService;
-        this.applicationEventPublisher = applicationEventPublisher;
-    }
+    private LiveHttpClient httpClient;
 
     public LiveHttpClient getHttpClient() {
         if (httpClient == null) {
@@ -268,6 +249,7 @@ public class LiveClientService {
                         GiftMsg giftMsg = new GiftMsg().buildFrom(liveClient, event);
                         giftMsgRepository.save(giftMsg);
                         applicationEventPublisher.publishEvent(new GiftMsgEvent(this, giftMsg));
+                        notificationService.send(new CustomSocketMsg(JSONUtil.toJsonStr(giftMsg), CustomMsgType.GIFT_MSG), liveClient.getRoomInfo().getHostName());
                     } catch (Exception e) {
                         log.error("Error while saving Gift", e);
                     }
@@ -278,6 +260,12 @@ public class LiveClientService {
                 })
                 .onJoin((liveClient, event) -> {
                     log.info("{} New Join: {}", liveClient.getRoomInfo().getHostName(), event.getUser());
+                    try {
+                        enterRoomMsgRepository.save(new EnterRoomMsg().buildFrom(liveClient, event));
+                        notificationService.send(new CustomSocketMsg(JSONUtil.toJsonStr(event), CustomMsgType.ENTER_ROOM_MSG), liveClient.getRoomInfo().getHostName());
+                    } catch (Exception e) {
+                        log.error("Error while saving Join", e);
+                    }
                 })
                 .onEvent((liveClient, event) -> {
                     if (event instanceof TikTokLinkMicBattleEvent linkMicBattleEvent) {
