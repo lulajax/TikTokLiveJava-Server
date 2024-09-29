@@ -197,6 +197,7 @@ public class LiveClientService {
                     liveClientSettings.setOffline(false);
                     liveClientSettings.setPrintToConsole(true);
                     liveClientSettings.setFetchGifts(false);
+                    liveClientSettings.setPingInterval(5000L);
 //                    liveClientSettings.setThrowOnAgeRestriction(true);
 //                    liveClientSettings.setRetryOnConnectionFailure(true); // Reconnecting if TikTok user is offline
 //                    liveClientSettings.setRetryConnectionTimeout(Duration.ofSeconds(1)); // Timeout before next reconnection
