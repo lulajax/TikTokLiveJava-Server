@@ -220,7 +220,8 @@ public class LiveClientService {
                     disconnect(liveClient.getRoomInfo().getHostName(), "直播结束");
                 })
                 .onDisconnected((liveClient, event) -> {
-                    log.info("{} Disconnected {} ConnectionState:{}", liveClient.getRoomInfo().getHostName(), event.getReason(), liveClient.getRoomInfo().getConnectionState());
+                    log.info("{} Disconnected, code:{} reason:{} remote:{} ConnectionState:{}",
+                            liveClient.getRoomInfo().getHostName(), event.getCode(), event.getReason(), event.isRemote(), liveClient.getRoomInfo().getConnectionState());
                     Long hostId = clientConnect != null && clientConnect.getHostId() != null ? clientConnect.getHostId() : liveClient.getRoomInfo().getHost().getId();
                     ThreadUtil.execAsync(() -> connectLogRepository.save(new ConnectLog(liveClient.getRoomInfo().getRoomId(), hostId, hostName, ConnectionState.DISCONNECTED.toString())));
                     updateDisconnectedState(hostName);
