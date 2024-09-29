@@ -249,7 +249,7 @@ public class LiveClientService {
                         GiftMsg giftMsg = new GiftMsg().buildFrom(liveClient, event);
                         giftMsgRepository.save(giftMsg);
                         applicationEventPublisher.publishEvent(new GiftMsgEvent(this, giftMsg));
-                        notificationService.send(new CustomSocketMsg(JSONUtil.toJsonStr(giftMsg), CustomMsgType.GIFT_MSG), liveClient.getRoomInfo().getHostName());
+                        notificationService.send(new CustomSocketMsg(JSONUtil.toJsonStr(giftMsg), CustomMsgType.GIFT_MSG.getType()), liveClient.getRoomInfo().getHostName());
                     } catch (Exception e) {
                         log.error("Error while saving Gift", e);
                     }
@@ -262,7 +262,7 @@ public class LiveClientService {
                     log.info("{} New Join: {}", liveClient.getRoomInfo().getHostName(), event.getUser());
                     try {
                         EnterRoomMsg enterRoomMsg = enterRoomMsgRepository.save(new EnterRoomMsg().buildFrom(liveClient, event));
-                        notificationService.send(new CustomSocketMsg(JSONUtil.toJsonStr(enterRoomMsg), CustomMsgType.ENTER_ROOM_MSG), liveClient.getRoomInfo().getHostName());
+                        notificationService.send(new CustomSocketMsg(JSONUtil.toJsonStr(enterRoomMsg), CustomMsgType.ENTER_ROOM_MSG.getType()), liveClient.getRoomInfo().getHostName());
                     } catch (Exception e) {
                         log.error("Error while saving Join", e);
                     }
