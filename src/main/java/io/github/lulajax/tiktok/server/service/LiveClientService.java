@@ -261,8 +261,8 @@ public class LiveClientService {
                 .onJoin((liveClient, event) -> {
                     log.info("{} New Join: {}", liveClient.getRoomInfo().getHostName(), event.getUser());
                     try {
-                        enterRoomMsgRepository.save(new EnterRoomMsg().buildFrom(liveClient, event));
-                        notificationService.send(new CustomSocketMsg(JSONUtil.toJsonStr(event), CustomMsgType.ENTER_ROOM_MSG), liveClient.getRoomInfo().getHostName());
+                        EnterRoomMsg enterRoomMsg = enterRoomMsgRepository.save(new EnterRoomMsg().buildFrom(liveClient, event));
+                        notificationService.send(new CustomSocketMsg(JSONUtil.toJsonStr(enterRoomMsg), CustomMsgType.ENTER_ROOM_MSG), liveClient.getRoomInfo().getHostName());
                     } catch (Exception e) {
                         log.error("Error while saving Join", e);
                     }
