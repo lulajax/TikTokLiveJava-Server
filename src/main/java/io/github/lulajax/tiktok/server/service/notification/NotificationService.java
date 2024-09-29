@@ -18,7 +18,7 @@ public class NotificationService {
     private String registryServerUrl;
 
     public CommonResult<String> send(CustomSocketMsg socketMsg, String hostName) {
-        String url = registryServerUrl + "/api/tiktok-live/notification/send/" + hostName;
+        String url = registryServerUrl + "/api/tiktok-notification/send/" + hostName;
         log.info("send hostName:{} socketMsg:{} url:{}", hostName, socketMsg, url);
         String response = HttpUtil.post(url, JSONUtil.toJsonStr(socketMsg), 5000);
         log.info("send hostName:{} response:{}", hostName, response);
